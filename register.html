@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>IAD SmartCare — สมัครใช้งาน</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@500;700&family=Noto+Sans+Thai:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+<script>
+tailwind.config = {
+  theme: {
+    extend: {
+      colors: {
+        brand: {
+          50: '#f0fdfa', 100: '#ccfbf1', 200: '#99f6e4', 300: '#5eead4',
+          400: '#2dd4bf', 500: '#14b8a6', 600: '#0d9488', 700: '#0f766e',
+          800: '#115e59', 900: '#134e4a', 950: '#042f2e',
+        }
+      },
+      fontFamily: {
+        sans: ['Inter', 'Noto Sans Thai', 'system-ui', 'sans-serif'],
+        mono: ['JetBrains Mono', 'monospace'],
+      }
+    }
+  }
+}
+</script>
+<style>
+body { font-family: 'Inter', 'Noto Sans Thai', sans-serif; }
+.font-mono { font-family: 'JetBrains Mono', monospace; }
+
+.role-card { transition: all 0.2s ease; }
+.role-card.selected {
+  border-color: #0f766e;
+  background: #f0fdfa;
+  box-shadow: 0 0 0 1px #0f766e;
+}
+.role-card .check-circle { opacity: 0; transition: opacity 0.2s; }
+.role-card.selected .check-circle { opacity: 1; }
+
+@keyframes check-bounce {
+  0% { transform: scale(0); }
+  60% { transform: scale(1.15); }
+  100% { transform: scale(1); }
+}
+.check-bounce { animation: check-bounce 0.4s ease-out; }
+</style>
+</head>
+<body class="bg-slate-50 min-h-screen">
+
+<!-- ============================================== -->
+<!-- FORM VIEW (default) -->
+<!-- ============================================== -->
+<div id="form-view">
+
+<!-- MOBILE -->
+<div class="md:hidden min-h-screen bg-white">
+  <!-- Header -->
+  <div class="bg-white border-b border-slate-100 px-5 py-4 flex items-center gap-3 sticky top-0 z-10">
+    <a href="login.html" class="w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center">
+      <i data-lucide="arrow-left" class="w-5 h-5 text-slate-700"></i>
+    </a>
+    <div>
+      <h1 class="text-base font-bold text-slate-900">สมัครใช้งาน</h1>
+      <p class="text-xs text-slate-500">ใช้เวลาประมาณ 2 นาที</p>
+    </div>
+  </div>
+
+  <form class="px-5 py-6 space-y-5 pb-32" onsubmit="event.preventDefault(); showSuccess();">
+    <!-- Section 1: ข้อมูลส่วนตัว -->
+    <div>
+      <h2 class="text-xs font-bold text-brand-700 uppercase tracking-wider mb-3">ข้อมูลส่วนตัว</h2>
+      <div class="space-y-3">
+        <div>
+          <label class="text-xs text-slate-600 mb-1 block">ชื่อ-สกุล</label>
+          <input type="text" placeholder="เช่น ณัฐธิดา ใจดี" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-brand-700 focus:bg-white">
+        </div>
+        <div>
+          <label class="text-xs text-slate-600 mb-1 block">รหัสพนักงาน</label>
+          <input type="text" placeholder="เช่น 670045" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm font-mono focus:outline-none focus:border-brand-700 focus:bg-white">
+        </div>
+        <div>
+          <label class="text-xs text-slate-600 mb-1 block">อีเมล</label>
+          <input type="email" placeholder="nurse@hospital.go.th" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-brand-700 focus:bg-white">
+        </div>
+      </div>
+    </div>
+
+    <!-- Section 2: ตำแหน่ง -->
+    <div>
+      <h2 class="text-xs font-bold text-brand-700 uppercase tracking-wider mb-3">บทบาทในระบบ</h2>
+      <div class="space-y-2.5">
+        <div class="role-card selected border-2 border-slate-200 rounded-xl p-3.5 cursor-pointer flex items-center gap-3" onclick="selectRole(this)">
+          <div class="w-10 h-10 rounded-lg bg-brand-100 flex items-center justify-center flex-shrink-0">
+            <i data-lucide="user" class="w-5 h-5 text-brand-700"></i>
+          </div>
+          <div class="flex-1">
+            <div class="text-sm font-bold text-slate-900">พยาบาลประจำการ</div>
+            <div class="text-[11px] text-slate-500">บันทึกข้อมูลและประเมินแผล</div>
+          </div>
+          <div class="check-circle w-5 h-5 bg-brand-700 rounded-full flex items-center justify-center flex-shrink-0">
+            <i data-lucide="check" class="w-3.5 h-3.5 text-white"></i>
+          </div>
+        </div>
+
+        <div class="role-card border-2 border-slate-200 rounded-xl p-3.5 cursor-pointer flex items-center gap-3" onclick="selectRole(this)">
+          <div class="w-10 h-10 rounded-lg bg-brand-100 flex items-center justify-center flex-shrink-0">
+            <i data-lucide="user-check" class="w-5 h-5 text-brand-700"></i>
+          </div>
+          <div class="flex-1">
+            <div class="text-sm font-bold text-slate-900">หัวหน้าวอร์ด</div>
+            <div class="text-[11px] text-slate-500">อนุมัติบัญชีและดูรายงานของวอร์ด</div>
+          </div>
+          <div class="check-circle w-5 h-5 bg-brand-700 rounded-full flex items-center justify-center flex-shrink-0">
+            <i data-lucide="check" class="w-3.5 h-3.5 text-white"></i>
+          </div>
+        </div>
+      </div>
+
+      <div class="mt-4">
+        <label class="text-xs text-slate-600 mb-1 block">หอผู้ป่วยที่ประจำ</label>
+        <select class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-brand-700 focus:bg-white appearance-none">
+          <option>เลือกหอผู้ป่วย</option>
+          <option selected>Ward 3A — อายุรกรรม</option>
+          <option>Ward 3B — อายุรกรรม</option>
+          <option>Ward 5C — ICU</option>
+          <option>Ward 7 — ศัลยกรรม</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- Section 3: รหัสผ่าน -->
+    <div>
+      <h2 class="text-xs font-bold text-brand-700 uppercase tracking-wider mb-3">ตั้งรหัสผ่าน</h2>
+      <div class="space-y-3">
+        <div>
+          <label class="text-xs text-slate-600 mb-1 block">รหัสผ่าน</label>
+          <div class="relative">
+            <input type="password" id="m-pwd" placeholder="อย่างน้อย 8 ตัวอักษร" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 pr-12 py-3 text-sm focus:outline-none focus:border-brand-700 focus:bg-white">
+            <button type="button" onclick="togglePwd('m-pwd', 'm-eye')" class="absolute right-4 top-1/2 -translate-y-1/2">
+              <i data-lucide="eye" id="m-eye" class="w-4 h-4 text-slate-400"></i>
+            </button>
+          </div>
+          <div class="flex gap-1 mt-2">
+            <div class="h-1 flex-1 bg-emerald-500 rounded-full"></div>
+            <div class="h-1 flex-1 bg-emerald-500 rounded-full"></div>
+            <div class="h-1 flex-1 bg-emerald-500 rounded-full"></div>
+            <div class="h-1 flex-1 bg-slate-200 rounded-full"></div>
+          </div>
+          <p class="text-[11px] text-slate-500 mt-1">ความปลอดภัย: <span class="text-emerald-600 font-semibold">ดี</span></p>
+        </div>
+        <div>
+          <label class="text-xs text-slate-600 mb-1 block">ยืนยันรหัสผ่าน</label>
+          <input type="password" placeholder="กรอกซ้ำอีกครั้ง" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-brand-700 focus:bg-white">
+        </div>
+      </div>
+    </div>
+
+    <!-- Section 4: PDPA Consent -->
+    <div class="bg-slate-50 rounded-xl p-4 border border-slate-200">
+      <label class="flex items-start gap-3 cursor-pointer">
+        <input type="checkbox" required class="w-5 h-5 accent-brand-700 rounded mt-0.5 flex-shrink-0">
+        <div class="text-xs text-slate-600 leading-relaxed">
+          ข้าพเจ้ายินยอมให้ระบบเก็บและประมวลผลข้อมูลส่วนบุคคลและข้อมูลผู้ป่วยตาม <a href="#" class="text-brand-700 font-semibold underline">นโยบาย PDPA</a> และจะรักษาความลับของข้อมูลผู้ป่วยตามจรรยาบรรณวิชาชีพ
+        </div>
+      </label>
+    </div>
+  </form>
+
+  <!-- Fixed bottom button -->
+  <div class="fixed bottom-0 left-0 right-0 bg-white border-t border-slate-100 px-5 py-4 md:hidden">
+    <button onclick="showSuccess()" class="w-full bg-brand-900 hover:bg-brand-950 text-white font-bold py-4 rounded-xl flex items-center justify-center gap-2 shadow-lg shadow-brand-900/25">
+      ส่งคำขอสมัครใช้งาน
+      <i data-lucide="send" class="w-4 h-4"></i>
+    </button>
+  </div>
+</div>
+
+
+<!-- DESKTOP -->
+<div class="hidden md:block min-h-screen bg-slate-50 py-12 px-6">
+  <div class="max-w-3xl mx-auto">
+    <!-- Header -->
+    <div class="flex items-center justify-between mb-8">
+      <a href="login.html" class="inline-flex items-center gap-2 text-sm font-semibold text-slate-600 hover:text-brand-700">
+        <i data-lucide="arrow-left" class="w-4 h-4"></i>
+        กลับไปหน้า login
+      </a>
+      <p class="text-xs text-slate-400 font-mono">step 1 / 1</p>
+    </div>
+
+    <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+      <!-- Top banner -->
+      <div class="bg-gradient-to-br from-brand-700 to-brand-900 px-10 py-8 relative overflow-hidden">
+        <div class="absolute -top-10 -right-10 w-48 h-48 rounded-full border-[16px] border-white/5"></div>
+        <div class="relative flex items-center gap-4">
+          <div class="w-12 h-12 bg-white/15 backdrop-blur rounded-xl flex items-center justify-center">
+            <i data-lucide="user-plus" class="w-6 h-6 text-white"></i>
+          </div>
+          <div>
+            <h1 class="text-2xl font-extrabold text-white">สมัครใช้งาน IAD SmartCare</h1>
+            <p class="text-white/70 text-sm mt-1">บัญชีของคุณจะใช้งานได้หลังหัวหน้าวอร์ดอนุมัติ</p>
+          </div>
+        </div>
+      </div>
+
+      <form class="p-10 space-y-8" onsubmit="event.preventDefault(); showSuccess();">
+        <!-- Section 1 -->
+        <div>
+          <div class="flex items-center gap-3 mb-5">
+            <div class="w-8 h-8 rounded-full bg-brand-100 text-brand-700 font-bold text-sm flex items-center justify-center">1</div>
+            <h2 class="text-base font-bold text-slate-900">ข้อมูลส่วนตัว</h2>
+          </div>
+          <div class="grid grid-cols-2 gap-4 pl-11">
+            <div>
+              <label class="text-xs font-semibold text-slate-700 mb-1.5 block uppercase tracking-wider">ชื่อ-สกุล</label>
+              <input type="text" placeholder="เช่น ณัฐธิดา ใจดี" class="w-full bg-slate-50 border border-slate-200 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:border-brand-700 focus:bg-white">
+            </div>
+            <div>
+              <label class="text-xs font-semibold text-slate-700 mb-1.5 block uppercase tracking-wider">รหัสพนักงาน</label>
+              <input type="text" placeholder="6 หลัก" class="w-full bg-slate-50 border border-slate-200 rounded-lg px-4 py-2.5 text-sm font-mono focus:outline-none focus:border-brand-700 focus:bg-white">
+            </div>
+            <div class="col-span-2">
+              <label class="text-xs font-semibold text-slate-700 mb-1.5 block uppercase tracking-wider">อีเมล</label>
+              <input type="email" placeholder="nurse@hospital.go.th" class="w-full bg-slate-50 border border-slate-200 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:border-brand-700 focus:bg-white">
+            </div>
+          </div>
+        </div>
+
+        <!-- Section 2 -->
+        <div>
+          <div class="flex items-center gap-3 mb-5">
+            <div class="w-8 h-8 rounded-full bg-brand-100 text-brand-700 font-bold text-sm flex items-center justify-center">2</div>
+            <h2 class="text-base font-bold text-slate-900">บทบาทและหอผู้ป่วย</h2>
+          </div>
+          <div class="pl-11">
+            <div class="grid grid-cols-2 gap-3">
+              <div class="role-card selected border-2 border-slate-200 rounded-xl p-4 cursor-pointer relative" onclick="selectRole(this)">
+                <div class="check-circle absolute top-3 right-3 w-5 h-5 bg-brand-700 rounded-full flex items-center justify-center">
+                  <i data-lucide="check" class="w-3.5 h-3.5 text-white"></i>
+                </div>
+                <div class="w-10 h-10 rounded-lg bg-brand-100 flex items-center justify-center mb-3">
+                  <i data-lucide="user" class="w-5 h-5 text-brand-700"></i>
+                </div>
+                <div class="text-sm font-bold text-slate-900">พยาบาลประจำการ</div>
+                <div class="text-xs text-slate-500 mt-1">บันทึกข้อมูลและประเมินแผลในวอร์ด</div>
+              </div>
+              <div class="role-card border-2 border-slate-200 rounded-xl p-4 cursor-pointer relative" onclick="selectRole(this)">
+                <div class="check-circle absolute top-3 right-3 w-5 h-5 bg-brand-700 rounded-full flex items-center justify-center">
+                  <i data-lucide="check" class="w-3.5 h-3.5 text-white"></i>
+                </div>
+                <div class="w-10 h-10 rounded-lg bg-brand-100 flex items-center justify-center mb-3">
+                  <i data-lucide="user-check" class="w-5 h-5 text-brand-700"></i>
+                </div>
+                <div class="text-sm font-bold text-slate-900">หัวหน้าวอร์ด</div>
+                <div class="text-xs text-slate-500 mt-1">อนุมัติบัญชีและดูรายงานวอร์ด</div>
+              </div>
+            </div>
+
+            <div class="mt-4">
+              <label class="text-xs font-semibold text-slate-700 mb-1.5 block uppercase tracking-wider">หอผู้ป่วยที่ประจำ</label>
+              <select class="w-full bg-slate-50 border border-slate-200 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:border-brand-700 focus:bg-white">
+                <option>เลือกหอผู้ป่วย</option>
+                <option selected>Ward 3A — อายุรกรรม</option>
+                <option>Ward 3B — อายุรกรรม</option>
+                <option>Ward 5C — ICU</option>
+                <option>Ward 7 — ศัลยกรรม</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <!-- Section 3 -->
+        <div>
+          <div class="flex items-center gap-3 mb-5">
+            <div class="w-8 h-8 rounded-full bg-brand-100 text-brand-700 font-bold text-sm flex items-center justify-center">3</div>
+            <h2 class="text-base font-bold text-slate-900">ตั้งรหัสผ่าน</h2>
+          </div>
+          <div class="grid grid-cols-2 gap-4 pl-11">
+            <div>
+              <label class="text-xs font-semibold text-slate-700 mb-1.5 block uppercase tracking-wider">รหัสผ่าน</label>
+              <div class="relative">
+                <input type="password" id="d-pwd" placeholder="อย่างน้อย 8 ตัวอักษร" class="w-full bg-slate-50 border border-slate-200 rounded-lg px-4 pr-11 py-2.5 text-sm focus:outline-none focus:border-brand-700 focus:bg-white">
+                <button type="button" onclick="togglePwd('d-pwd', 'd-eye')" class="absolute right-3.5 top-1/2 -translate-y-1/2">
+                  <i data-lucide="eye" id="d-eye" class="w-4 h-4 text-slate-400"></i>
+                </button>
+              </div>
+              <div class="flex gap-1 mt-2">
+                <div class="h-1 flex-1 bg-emerald-500 rounded-full"></div>
+                <div class="h-1 flex-1 bg-emerald-500 rounded-full"></div>
+                <div class="h-1 flex-1 bg-emerald-500 rounded-full"></div>
+                <div class="h-1 flex-1 bg-slate-200 rounded-full"></div>
+              </div>
+            </div>
+            <div>
+              <label class="text-xs font-semibold text-slate-700 mb-1.5 block uppercase tracking-wider">ยืนยันรหัสผ่าน</label>
+              <input type="password" placeholder="กรอกซ้ำอีกครั้ง" class="w-full bg-slate-50 border border-slate-200 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:border-brand-700 focus:bg-white">
+            </div>
+          </div>
+        </div>
+
+        <!-- PDPA -->
+        <div class="bg-slate-50 rounded-xl p-5 border border-slate-200 ml-11">
+          <label class="flex items-start gap-3 cursor-pointer">
+            <input type="checkbox" required class="w-5 h-5 accent-brand-700 rounded mt-0.5 flex-shrink-0">
+            <div class="text-sm text-slate-700 leading-relaxed">
+              ข้าพเจ้ายินยอมให้ระบบเก็บและประมวลผลข้อมูลส่วนบุคคลและข้อมูลผู้ป่วยตาม <a href="#" class="text-brand-700 font-semibold underline">นโยบาย PDPA</a> และจะรักษาความลับของข้อมูลผู้ป่วยตามจรรยาบรรณวิชาชีพ
+            </div>
+          </label>
+        </div>
+
+        <!-- Buttons -->
+        <div class="flex items-center justify-between pt-4 border-t border-slate-100">
+          <a href="login.html" class="text-sm font-semibold text-slate-600 hover:text-slate-900">ยกเลิก</a>
+          <button type="submit" class="bg-brand-900 hover:bg-brand-950 text-white font-bold px-8 py-3 rounded-lg flex items-center gap-2 shadow-lg shadow-brand-900/20">
+            ส่งคำขอสมัครใช้งาน
+            <i data-lucide="send" class="w-4 h-4"></i>
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+</div>
+
+<!-- ============================================== -->
+<!-- SUCCESS VIEW (hidden by default) -->
+<!-- ============================================== -->
+<div id="success-view" class="hidden min-h-screen bg-slate-50 flex items-center justify-center px-5 py-12">
+  <div class="bg-white rounded-3xl shadow-xl shadow-slate-200/50 max-w-md w-full p-8 md:p-12 text-center">
+    <div class="w-20 h-20 mx-auto bg-emerald-100 rounded-full flex items-center justify-center check-bounce">
+      <i data-lucide="check" class="w-10 h-10 text-emerald-600"></i>
+    </div>
+    <h1 class="text-2xl md:text-3xl font-extrabold text-slate-900 mt-6">ส่งคำขอเรียบร้อย</h1>
+    <p class="text-sm text-slate-500 mt-3 leading-relaxed">
+      หัวหน้าวอร์ดจะพิจารณาบัญชีของคุณภายใน <span class="font-semibold text-slate-900">1-2 วันทำการ</span><br>
+      เมื่ออนุมัติแล้ว ระบบจะส่งอีเมลแจ้งให้คุณทราบ
+    </p>
+
+    <div class="bg-slate-50 rounded-xl p-4 mt-6 text-left">
+      <div class="flex items-center gap-2 text-xs text-slate-500 mb-3">
+        <i data-lucide="info" class="w-3.5 h-3.5"></i>
+        <span class="font-semibold uppercase tracking-wider">ขั้นตอนถัดไป</span>
+      </div>
+      <ol class="space-y-2.5 text-sm text-slate-700">
+        <li class="flex gap-2.5"><span class="text-brand-700 font-bold">1.</span><span>รออีเมลยืนยันจากระบบ</span></li>
+        <li class="flex gap-2.5"><span class="text-brand-700 font-bold">2.</span><span>หัวหน้าวอร์ดตรวจสอบและอนุมัติ</span></li>
+        <li class="flex gap-2.5"><span class="text-brand-700 font-bold">3.</span><span>เข้าใช้งานระบบได้ทันที</span></li>
+      </ol>
+    </div>
+
+    <a href="login.html" class="block mt-8 w-full bg-brand-900 hover:bg-brand-950 text-white font-bold py-3.5 rounded-xl shadow-lg shadow-brand-900/20">
+      กลับไปหน้าเข้าสู่ระบบ
+    </a>
+  </div>
+</div>
+
+<script>
+function togglePwd(inputId, iconId) {
+  const input = document.getElementById(inputId);
+  const icon = document.getElementById(iconId);
+  if (input.type === 'password') {
+    input.type = 'text';
+    icon.setAttribute('data-lucide', 'eye-off');
+  } else {
+    input.type = 'password';
+    icon.setAttribute('data-lucide', 'eye');
+  }
+  lucide.createIcons();
+}
+
+function selectRole(card) {
+  // unselect all siblings in the same group
+  const parent = card.parentElement;
+  parent.querySelectorAll('.role-card').forEach(c => c.classList.remove('selected'));
+  card.classList.add('selected');
+}
+
+function showSuccess() {
+  document.getElementById('form-view').classList.add('hidden');
+  document.getElementById('success-view').classList.remove('hidden');
+  window.scrollTo(0, 0);
+  setTimeout(() => lucide.createIcons(), 50);
+}
+
+lucide.createIcons();
+</script>
+</body>
+</html>

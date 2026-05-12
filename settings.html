@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>IAD SmartCare — ตั้งค่า</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@500;700&family=Noto+Sans+Thai:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+<script>
+tailwind.config = { theme: { extend: { colors: { brand: { 50:'#f0fdfa',100:'#ccfbf1',200:'#99f6e4',300:'#5eead4',400:'#2dd4bf',500:'#14b8a6',600:'#0d9488',700:'#0f766e',800:'#115e59',900:'#134e4a',950:'#042f2e' } }, fontFamily: { sans: ['Inter','Noto Sans Thai','system-ui','sans-serif'], mono: ['JetBrains Mono','monospace'] } } } }
+</script>
+<style>
+body { font-family: 'Inter','Noto Sans Thai',sans-serif; }
+.font-mono { font-family: 'JetBrains Mono',monospace; }
+.modal-backdrop { background: rgba(15,23,42,0.5); backdrop-filter: blur(4px); }
+@keyframes modal-in { from { opacity: 0; transform: scale(0.95); } to { opacity: 1; transform: scale(1); } }
+.modal-content { animation: modal-in 0.2s ease-out; }
+
+/* Toggle switch */
+.toggle { position: relative; display: inline-block; width: 44px; height: 24px; }
+.toggle input { opacity: 0; width: 0; height: 0; }
+.toggle-slider { position: absolute; cursor: pointer; inset: 0; background: #cbd5e1; transition: 0.2s; border-radius: 24px; }
+.toggle-slider::before { content: ''; position: absolute; height: 18px; width: 18px; left: 3px; top: 3px; background: white; transition: 0.2s; border-radius: 50%; box-shadow: 0 1px 3px rgba(0,0,0,0.15); }
+.toggle input:checked + .toggle-slider { background: #0f766e; }
+.toggle input:checked + .toggle-slider::before { transform: translateX(20px); }
+
+/* Sidebar toggle */
+#sidebar { transition: margin-left 0.3s ease, opacity 0.2s ease; }
+#sidebar.collapsed { margin-left: -16rem; opacity: 0.4; pointer-events: none; }
+#sidebar-toggle-btn { transition: all 0.2s ease; }
+#sidebar-toggle-btn:hover { transform: scale(1.05); }
+</style>
+</head>
+<body class="bg-slate-50 min-h-screen">
+
+<!-- MOBILE -->
+<div class="md:hidden min-h-screen pb-24">
+  <div class="bg-white px-5 pt-5 pb-4 border-b border-slate-100 sticky top-0 z-20">
+    <div class="flex items-center gap-3">
+      <a href="dashboard.html" class="w-9 h-9 rounded-full bg-slate-100 flex items-center justify-center">
+        <i data-lucide="arrow-left" class="w-4 h-4 text-slate-700"></i>
+      </a>
+      <h1 class="text-lg font-bold text-slate-900">ตั้งค่า</h1>
+    </div>
+  </div>
+
+  <div class="px-5 pt-5">
+    <!-- Profile -->
+    <div class="bg-white rounded-2xl p-5 border border-slate-100 mb-4">
+      <div class="flex items-center gap-4">
+        <div class="w-16 h-16 bg-brand-900 rounded-full flex items-center justify-center text-white text-xl font-bold">ณธ</div>
+        <div class="flex-1">
+          <div class="text-base font-bold text-slate-900">ณัฐธิดา ใจดี</div>
+          <div class="text-xs text-slate-500 mt-0.5">พยาบาลประจำการ · Ward 3A</div>
+          <div class="text-[11px] text-slate-400 font-mono mt-0.5">nattida@hospital.go.th</div>
+        </div>
+        <button class="text-xs font-semibold text-brand-700">แก้ไข</button>
+      </div>
+    </div>
+
+    <!-- Account -->
+    <h2 class="text-[10px] font-bold text-slate-500 uppercase tracking-wider px-2 mb-2">บัญชี</h2>
+    <div class="bg-white rounded-2xl border border-slate-100 mb-4 divide-y divide-slate-100">
+      <button onclick="openModal('profile-modal')" class="w-full p-4 flex items-center gap-3 text-left">
+        <div class="w-9 h-9 bg-slate-100 rounded-lg flex items-center justify-center"><i data-lucide="user" class="w-4 h-4 text-slate-600"></i></div>
+        <div class="flex-1"><div class="text-sm font-semibold text-slate-900">ข้อมูลส่วนตัว</div><div class="text-[11px] text-slate-500">ชื่อ, อีเมล, รหัสพนักงาน</div></div>
+        <i data-lucide="chevron-right" class="w-4 h-4 text-slate-400"></i>
+      </button>
+      <button onclick="openModal('password-modal')" class="w-full p-4 flex items-center gap-3 text-left">
+        <div class="w-9 h-9 bg-slate-100 rounded-lg flex items-center justify-center"><i data-lucide="lock" class="w-4 h-4 text-slate-600"></i></div>
+        <div class="flex-1"><div class="text-sm font-semibold text-slate-900">เปลี่ยนรหัสผ่าน</div><div class="text-[11px] text-slate-500">เปลี่ยนล่าสุด 30 วันที่แล้ว</div></div>
+        <i data-lucide="chevron-right" class="w-4 h-4 text-slate-400"></i>
+      </button>
+      <button class="w-full p-4 flex items-center gap-3 text-left">
+        <div class="w-9 h-9 bg-slate-100 rounded-lg flex items-center justify-center"><i data-lucide="map-pin" class="w-4 h-4 text-slate-600"></i></div>
+        <div class="flex-1"><div class="text-sm font-semibold text-slate-900">หอผู้ป่วยที่ประจำ</div><div class="text-[11px] text-slate-500">Ward 3A · อายุรกรรม</div></div>
+        <i data-lucide="chevron-right" class="w-4 h-4 text-slate-400"></i>
+      </button>
+    </div>
+
+    <!-- Notifications -->
+    <h2 class="text-[10px] font-bold text-slate-500 uppercase tracking-wider px-2 mb-2">การแจ้งเตือน</h2>
+    <div class="bg-white rounded-2xl border border-slate-100 mb-4 divide-y divide-slate-100">
+      <div class="p-4 flex items-center gap-3">
+        <div class="w-9 h-9 bg-slate-100 rounded-lg flex items-center justify-center"><i data-lucide="bell" class="w-4 h-4 text-slate-600"></i></div>
+        <div class="flex-1"><div class="text-sm font-semibold text-slate-900">ครบรอบประเมิน</div><div class="text-[11px] text-slate-500">เตือนทุก 8-12 ชม.</div></div>
+        <label class="toggle"><input type="checkbox" checked><span class="toggle-slider"></span></label>
+      </div>
+      <div class="p-4 flex items-center gap-3">
+        <div class="w-9 h-9 bg-slate-100 rounded-lg flex items-center justify-center"><i data-lucide="alert-triangle" class="w-4 h-4 text-slate-600"></i></div>
+        <div class="flex-1"><div class="text-sm font-semibold text-slate-900">เมื่อระดับแย่ลง</div><div class="text-[11px] text-slate-500">Cat เพิ่มขึ้น</div></div>
+        <label class="toggle"><input type="checkbox" checked><span class="toggle-slider"></span></label>
+      </div>
+      <div class="p-4 flex items-center gap-3">
+        <div class="w-9 h-9 bg-slate-100 rounded-lg flex items-center justify-center"><i data-lucide="user-plus" class="w-4 h-4 text-slate-600"></i></div>
+        <div class="flex-1"><div class="text-sm font-semibold text-slate-900">ผู้ป่วยใหม่</div><div class="text-[11px] text-slate-500">เมื่อมีคนเพิ่มผู้ป่วยใหม่</div></div>
+        <label class="toggle"><input type="checkbox"><span class="toggle-slider"></span></label>
+      </div>
+      <div class="p-4 flex items-center gap-3">
+        <div class="w-9 h-9 bg-slate-100 rounded-lg flex items-center justify-center"><i data-lucide="mail" class="w-4 h-4 text-slate-600"></i></div>
+        <div class="flex-1"><div class="text-sm font-semibold text-slate-900">สรุปรายวันทางอีเมล</div><div class="text-[11px] text-slate-500">ส่งทุก 8:00 น.</div></div>
+        <label class="toggle"><input type="checkbox" checked><span class="toggle-slider"></span></label>
+      </div>
+    </div>
+
+    <!-- About -->
+    <h2 class="text-[10px] font-bold text-slate-500 uppercase tracking-wider px-2 mb-2">เกี่ยวกับระบบ</h2>
+    <div class="bg-white rounded-2xl border border-slate-100 mb-4 divide-y divide-slate-100">
+      <button class="w-full p-4 flex items-center gap-3 text-left">
+        <div class="w-9 h-9 bg-slate-100 rounded-lg flex items-center justify-center"><i data-lucide="shield" class="w-4 h-4 text-slate-600"></i></div>
+        <div class="flex-1"><div class="text-sm font-semibold text-slate-900">นโยบาย PDPA</div></div>
+        <i data-lucide="chevron-right" class="w-4 h-4 text-slate-400"></i>
+      </button>
+      <button class="w-full p-4 flex items-center gap-3 text-left">
+        <div class="w-9 h-9 bg-slate-100 rounded-lg flex items-center justify-center"><i data-lucide="book-open" class="w-4 h-4 text-slate-600"></i></div>
+        <div class="flex-1"><div class="text-sm font-semibold text-slate-900">คู่มือการใช้งาน</div></div>
+        <i data-lucide="chevron-right" class="w-4 h-4 text-slate-400"></i>
+      </button>
+      <button class="w-full p-4 flex items-center gap-3 text-left">
+        <div class="w-9 h-9 bg-slate-100 rounded-lg flex items-center justify-center"><i data-lucide="info" class="w-4 h-4 text-slate-600"></i></div>
+        <div class="flex-1"><div class="text-sm font-semibold text-slate-900">เกี่ยวกับ</div><div class="text-[11px] text-slate-500 font-mono">v0.1.0 · prototype</div></div>
+        <i data-lucide="chevron-right" class="w-4 h-4 text-slate-400"></i>
+      </button>
+    </div>
+
+    <!-- Sign out -->
+    <button onclick="openModal('signout-modal')" class="w-full bg-white rounded-2xl border border-red-200 p-4 flex items-center justify-center gap-2 text-sm font-bold text-red-600">
+      <i data-lucide="log-out" class="w-4 h-4"></i>ออกจากระบบ
+    </button>
+  </div>
+
+  <!-- Bottom Nav -->
+  <div class="fixed bottom-0 left-0 right-0 bg-white border-t border-slate-200 px-2 py-2 flex items-center justify-around z-30">
+    <a href="dashboard.html" class="flex flex-col items-center gap-1 px-4 py-1.5"><i data-lucide="home" class="w-5 h-5 text-slate-400"></i><span class="text-[10px] font-medium text-slate-500">หน้าหลัก</span></a>
+    <a href="patients.html" class="flex flex-col items-center gap-1 px-4 py-1.5"><i data-lucide="users" class="w-5 h-5 text-slate-400"></i><span class="text-[10px] font-medium text-slate-500">ผู้ป่วย</span></a>
+    <a href="assessment.html" class="flex flex-col items-center gap-1 -mt-6">
+      <div class="w-14 h-14 bg-brand-900 rounded-full flex items-center justify-center shadow-lg shadow-brand-900/30 ring-4 ring-white"><i data-lucide="plus" class="w-7 h-7 text-white"></i></div>
+    </a>
+    <a href="reports.html" class="flex flex-col items-center gap-1 px-4 py-1.5"><i data-lucide="bar-chart-3" class="w-5 h-5 text-slate-400"></i><span class="text-[10px] font-medium text-slate-500">รายงาน</span></a>
+    <a href="settings.html" class="flex flex-col items-center gap-1 px-4 py-1.5"><i data-lucide="settings" class="w-5 h-5 text-brand-700"></i><span class="text-[10px] font-bold text-brand-700">ตั้งค่า</span></a>
+  </div>
+</div>
+
+<!-- DESKTOP -->
+<div class="hidden md:flex min-h-screen">
+  <aside id="sidebar" class="w-64 bg-white border-r border-slate-200 flex flex-col">
+    <div class="p-6 border-b border-slate-100">
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 bg-brand-900 rounded-xl flex items-center justify-center"><i data-lucide="shield-plus" class="w-5 h-5 text-white"></i></div>
+        <div><h1 class="text-sm font-bold text-slate-900">IAD SmartCare</h1><p class="text-[10px] text-slate-500 uppercase tracking-wider">Ward 3A</p></div>
+      </div>
+    </div>
+    <nav class="flex-1 p-4 space-y-1">
+      <a href="dashboard.html" class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-600 hover:bg-slate-50"><i data-lucide="home" class="w-5 h-5"></i><span class="text-sm">หน้าหลัก</span></a>
+      <a href="patients.html" class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-600 hover:bg-slate-50"><i data-lucide="users" class="w-5 h-5"></i><span class="text-sm">ผู้ป่วย</span></a>
+      <a href="assessment.html" class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-600 hover:bg-slate-50"><i data-lucide="clipboard-check" class="w-5 h-5"></i><span class="text-sm">ประเมินใหม่</span></a>
+      <a href="reports.html" class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-600 hover:bg-slate-50"><i data-lucide="bar-chart-3" class="w-5 h-5"></i><span class="text-sm">รายงาน</span></a>
+      <div class="pt-4 mt-4 border-t border-slate-100">
+        <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider px-3 mb-2">ระบบ</p>
+        <a href="users.html" class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-600 hover:bg-slate-50"><i data-lucide="user-cog" class="w-5 h-5"></i><span class="text-sm">จัดการผู้ใช้</span></a>
+        <a href="settings.html" class="flex items-center gap-3 px-3 py-2.5 rounded-lg bg-brand-50 text-brand-900 font-semibold"><i data-lucide="settings" class="w-5 h-5"></i><span class="text-sm">ตั้งค่า</span></a>
+      </div>
+    </nav>
+  </aside>
+
+  <main class="flex-1 overflow-auto relative">
+    <button id="sidebar-toggle-btn" onclick="toggleSidebar()" class="hidden md:flex absolute top-3.5 left-3 z-30 w-9 h-9 rounded-lg bg-white hover:bg-slate-100 border border-slate-200 shadow-sm items-center justify-center" title="ซ่อน/แสดงเมนู">
+      <i data-lucide="panel-left-close" id="sidebar-toggle-icon" class="w-4 h-4 text-slate-700"></i>
+    </button>
+    <header class="bg-white border-b border-slate-100 pl-16 pr-8 py-4 sticky top-0 z-20">
+      <h2 class="text-xl font-bold text-slate-900">ตั้งค่า</h2>
+      <p class="text-sm text-slate-500 mt-0.5">จัดการบัญชีและการแจ้งเตือนของคุณ</p>
+    </header>
+
+    <div class="p-8 max-w-4xl grid grid-cols-3 gap-6">
+      <!-- Side menu -->
+      <aside class="space-y-1">
+        <a href="#profile" class="flex items-center gap-3 px-3 py-2.5 rounded-lg bg-brand-50 text-brand-900 font-semibold"><i data-lucide="user" class="w-4 h-4"></i><span class="text-sm">โปรไฟล์</span></a>
+        <a href="#password" class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-600 hover:bg-slate-50"><i data-lucide="lock" class="w-4 h-4"></i><span class="text-sm">รหัสผ่าน</span></a>
+        <a href="#notifications" class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-600 hover:bg-slate-50"><i data-lucide="bell" class="w-4 h-4"></i><span class="text-sm">การแจ้งเตือน</span></a>
+        <a href="#about" class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-600 hover:bg-slate-50"><i data-lucide="info" class="w-4 h-4"></i><span class="text-sm">เกี่ยวกับ</span></a>
+      </aside>
+
+      <!-- Main panels -->
+      <div class="col-span-2 space-y-6">
+        <!-- Profile -->
+        <div id="profile" class="bg-white rounded-2xl p-6 border border-slate-100">
+          <h3 class="text-base font-bold text-slate-900 mb-5">โปรไฟล์</h3>
+          <div class="flex items-center gap-4 mb-6 pb-6 border-b border-slate-100">
+            <div class="w-20 h-20 bg-brand-900 rounded-full flex items-center justify-center text-white text-2xl font-bold">ณธ</div>
+            <div>
+              <div class="text-lg font-bold text-slate-900">ณัฐธิดา ใจดี</div>
+              <div class="text-sm text-slate-500">พยาบาลประจำการ · Ward 3A</div>
+              <button class="text-xs font-semibold text-brand-700 mt-2 hover:underline">เปลี่ยนรูปโปรไฟล์</button>
+            </div>
+          </div>
+          <div class="grid grid-cols-2 gap-4">
+            <div>
+              <label class="text-xs font-semibold text-slate-700 mb-1.5 block uppercase tracking-wider">ชื่อ-สกุล</label>
+              <input type="text" value="ณัฐธิดา ใจดี" class="w-full bg-slate-50 border border-slate-200 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:border-brand-700 focus:bg-white">
+            </div>
+            <div>
+              <label class="text-xs font-semibold text-slate-700 mb-1.5 block uppercase tracking-wider">รหัสพนักงาน</label>
+              <input type="text" value="670045" disabled class="w-full bg-slate-100 border border-slate-200 rounded-lg px-4 py-2.5 text-sm font-mono text-slate-500">
+            </div>
+            <div class="col-span-2">
+              <label class="text-xs font-semibold text-slate-700 mb-1.5 block uppercase tracking-wider">อีเมล</label>
+              <input type="email" value="nattida@hospital.go.th" class="w-full bg-slate-50 border border-slate-200 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:border-brand-700 focus:bg-white">
+            </div>
+            <div>
+              <label class="text-xs font-semibold text-slate-700 mb-1.5 block uppercase tracking-wider">หอผู้ป่วย</label>
+              <select class="w-full bg-slate-50 border border-slate-200 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:border-brand-700">
+                <option selected>Ward 3A — อายุรกรรม</option><option>Ward 3B — อายุรกรรม</option><option>Ward 5C — ICU</option>
+              </select>
+            </div>
+            <div>
+              <label class="text-xs font-semibold text-slate-700 mb-1.5 block uppercase tracking-wider">ตำแหน่ง</label>
+              <input type="text" value="พยาบาลประจำการ" disabled class="w-full bg-slate-100 border border-slate-200 rounded-lg px-4 py-2.5 text-sm text-slate-500">
+            </div>
+          </div>
+          <div class="flex justify-end gap-2 mt-6 pt-6 border-t border-slate-100">
+            <button class="px-4 py-2 text-sm font-semibold text-slate-600">ยกเลิก</button>
+            <button onclick="alert('บันทึกการเปลี่ยนแปลงแล้ว');" class="bg-brand-900 hover:bg-brand-950 text-white font-bold px-5 py-2 rounded-lg text-sm flex items-center gap-2">
+              <i data-lucide="save" class="w-4 h-4"></i>บันทึก
+            </button>
+          </div>
+        </div>
+
+        <!-- Password -->
+        <div id="password" class="bg-white rounded-2xl p-6 border border-slate-100">
+          <h3 class="text-base font-bold text-slate-900 mb-1">เปลี่ยนรหัสผ่าน</h3>
+          <p class="text-xs text-slate-500 mb-5">เปลี่ยนล่าสุดเมื่อ 30 วันที่แล้ว</p>
+          <div class="space-y-4 max-w-md">
+            <div>
+              <label class="text-xs font-semibold text-slate-700 mb-1.5 block uppercase tracking-wider">รหัสผ่านปัจจุบัน</label>
+              <input type="password" placeholder="••••••••" class="w-full bg-slate-50 border border-slate-200 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:border-brand-700">
+            </div>
+            <div>
+              <label class="text-xs font-semibold text-slate-700 mb-1.5 block uppercase tracking-wider">รหัสผ่านใหม่</label>
+              <input type="password" placeholder="อย่างน้อย 8 ตัวอักษร" class="w-full bg-slate-50 border border-slate-200 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:border-brand-700">
+            </div>
+            <div>
+              <label class="text-xs font-semibold text-slate-700 mb-1.5 block uppercase tracking-wider">ยืนยันรหัสผ่านใหม่</label>
+              <input type="password" placeholder="กรอกซ้ำ" class="w-full bg-slate-50 border border-slate-200 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:border-brand-700">
+            </div>
+          </div>
+          <div class="flex justify-end gap-2 mt-6 pt-6 border-t border-slate-100">
+            <button class="bg-brand-900 hover:bg-brand-950 text-white font-bold px-5 py-2 rounded-lg text-sm flex items-center gap-2">
+              <i data-lucide="lock" class="w-4 h-4"></i>เปลี่ยนรหัสผ่าน
+            </button>
+          </div>
+        </div>
+
+        <!-- Notifications -->
+        <div id="notifications" class="bg-white rounded-2xl p-6 border border-slate-100">
+          <h3 class="text-base font-bold text-slate-900 mb-5">การแจ้งเตือน</h3>
+          <div class="divide-y divide-slate-100 -mx-6">
+            <div class="px-6 py-4 flex items-center gap-3">
+              <div class="w-10 h-10 bg-amber-50 rounded-lg flex items-center justify-center"><i data-lucide="clock-alert" class="w-5 h-5 text-amber-700"></i></div>
+              <div class="flex-1"><div class="text-sm font-bold text-slate-900">ครบรอบประเมิน</div><div class="text-xs text-slate-500">แจ้งเตือนทุก 8-12 ชม. ตาม guideline</div></div>
+              <label class="toggle"><input type="checkbox" checked><span class="toggle-slider"></span></label>
+            </div>
+            <div class="px-6 py-4 flex items-center gap-3">
+              <div class="w-10 h-10 bg-red-50 rounded-lg flex items-center justify-center"><i data-lucide="alert-triangle" class="w-5 h-5 text-red-600"></i></div>
+              <div class="flex-1"><div class="text-sm font-bold text-slate-900">เมื่อระดับ IAD แย่ลง</div><div class="text-xs text-slate-500">แจ้งทันทีเมื่อ Cat เพิ่มขึ้น</div></div>
+              <label class="toggle"><input type="checkbox" checked><span class="toggle-slider"></span></label>
+            </div>
+            <div class="px-6 py-4 flex items-center gap-3">
+              <div class="w-10 h-10 bg-blue-50 rounded-lg flex items-center justify-center"><i data-lucide="user-plus" class="w-5 h-5 text-blue-600"></i></div>
+              <div class="flex-1"><div class="text-sm font-bold text-slate-900">ผู้ป่วยใหม่</div><div class="text-xs text-slate-500">เมื่อมีคนเพิ่มผู้ป่วยใหม่ในวอร์ด</div></div>
+              <label class="toggle"><input type="checkbox"><span class="toggle-slider"></span></label>
+            </div>
+            <div class="px-6 py-4 flex items-center gap-3">
+              <div class="w-10 h-10 bg-emerald-50 rounded-lg flex items-center justify-center"><i data-lucide="mail" class="w-5 h-5 text-emerald-600"></i></div>
+              <div class="flex-1"><div class="text-sm font-bold text-slate-900">สรุปรายวันทางอีเมล</div><div class="text-xs text-slate-500">ส่งทุกเช้า 8:00 น.</div></div>
+              <label class="toggle"><input type="checkbox" checked><span class="toggle-slider"></span></label>
+            </div>
+          </div>
+        </div>
+
+        <!-- Sign out -->
+        <div class="bg-white rounded-2xl p-6 border border-red-200">
+          <div class="flex items-center gap-4">
+            <div class="w-10 h-10 bg-red-50 rounded-lg flex items-center justify-center"><i data-lucide="log-out" class="w-5 h-5 text-red-600"></i></div>
+            <div class="flex-1">
+              <div class="text-sm font-bold text-slate-900">ออกจากระบบ</div>
+              <div class="text-xs text-slate-500">คุณจะต้องเข้าสู่ระบบใหม่หลังจากนี้</div>
+            </div>
+            <button onclick="openModal('signout-modal')" class="px-4 py-2 bg-red-50 hover:bg-red-100 text-red-700 font-bold text-sm rounded-lg flex items-center gap-2">
+              <i data-lucide="log-out" class="w-4 h-4"></i>ออกจากระบบ
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
+
+<!-- MODAL: Sign out -->
+<div id="signout-modal" class="hidden fixed inset-0 modal-backdrop z-50 flex items-center justify-center p-6" onclick="if(event.target===this) closeModal('signout-modal')">
+  <div class="modal-content bg-white rounded-2xl w-full max-w-sm overflow-hidden">
+    <div class="p-6 text-center">
+      <div class="w-14 h-14 bg-red-50 rounded-full flex items-center justify-center mx-auto mb-4"><i data-lucide="log-out" class="w-7 h-7 text-red-600"></i></div>
+      <h3 class="text-lg font-bold text-slate-900">ออกจากระบบ?</h3>
+      <p class="text-sm text-slate-500 mt-2">คุณต้องเข้าสู่ระบบใหม่เพื่อใช้งานต่อ</p>
+    </div>
+    <div class="px-6 py-3 border-t border-slate-100 bg-slate-50 flex items-center gap-2">
+      <button onclick="closeModal('signout-modal')" class="flex-1 px-4 py-2.5 text-sm font-semibold text-slate-600 bg-white border border-slate-200 rounded-lg">ยกเลิก</button>
+      <a href="login.html" class="flex-1 bg-red-600 hover:bg-red-700 text-white font-bold px-5 py-2.5 rounded-lg text-sm text-center">ออกจากระบบ</a>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: Edit profile (mobile) -->
+<div id="profile-modal" class="hidden fixed inset-0 modal-backdrop z-50 flex items-end md:items-center justify-center p-0 md:p-6" onclick="if(event.target===this) closeModal('profile-modal')">
+  <div class="modal-content bg-white rounded-t-3xl md:rounded-2xl w-full max-w-md overflow-hidden">
+    <div class="px-6 py-4 border-b border-slate-100 flex items-center justify-between">
+      <h3 class="text-base font-bold text-slate-900">แก้ไขข้อมูลส่วนตัว</h3>
+      <button onclick="closeModal('profile-modal')" class="w-8 h-8 rounded-full hover:bg-slate-100 flex items-center justify-center"><i data-lucide="x" class="w-4 h-4 text-slate-500"></i></button>
+    </div>
+    <div class="p-6 space-y-3">
+      <div><label class="text-xs text-slate-600 mb-1 block">ชื่อ-สกุล</label><input type="text" value="ณัฐธิดา ใจดี" class="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:border-brand-700"></div>
+      <div><label class="text-xs text-slate-600 mb-1 block">อีเมล</label><input type="email" value="nattida@hospital.go.th" class="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:border-brand-700"></div>
+      <div><label class="text-xs text-slate-600 mb-1 block">หอผู้ป่วย</label>
+        <select class="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:border-brand-700">
+          <option selected>Ward 3A — อายุรกรรม</option><option>Ward 3B — อายุรกรรม</option>
+        </select>
+      </div>
+    </div>
+    <div class="px-6 py-3 border-t border-slate-100 bg-slate-50 flex items-center justify-end gap-2">
+      <button onclick="closeModal('profile-modal')" class="px-4 py-2 text-sm font-semibold text-slate-600">ยกเลิก</button>
+      <button onclick="closeModal('profile-modal'); alert('บันทึกแล้ว');" class="bg-brand-900 text-white font-bold px-5 py-2 rounded-lg text-sm">บันทึก</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: Password (mobile) -->
+<div id="password-modal" class="hidden fixed inset-0 modal-backdrop z-50 flex items-end md:items-center justify-center p-0 md:p-6" onclick="if(event.target===this) closeModal('password-modal')">
+  <div class="modal-content bg-white rounded-t-3xl md:rounded-2xl w-full max-w-md overflow-hidden">
+    <div class="px-6 py-4 border-b border-slate-100 flex items-center justify-between">
+      <h3 class="text-base font-bold text-slate-900">เปลี่ยนรหัสผ่าน</h3>
+      <button onclick="closeModal('password-modal')" class="w-8 h-8 rounded-full hover:bg-slate-100 flex items-center justify-center"><i data-lucide="x" class="w-4 h-4 text-slate-500"></i></button>
+    </div>
+    <div class="p-6 space-y-3">
+      <div><label class="text-xs text-slate-600 mb-1 block">รหัสผ่านปัจจุบัน</label><input type="password" placeholder="••••••••" class="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:border-brand-700"></div>
+      <div><label class="text-xs text-slate-600 mb-1 block">รหัสผ่านใหม่</label><input type="password" placeholder="อย่างน้อย 8 ตัวอักษร" class="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:border-brand-700"></div>
+      <div><label class="text-xs text-slate-600 mb-1 block">ยืนยันรหัสผ่านใหม่</label><input type="password" placeholder="กรอกซ้ำ" class="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:border-brand-700"></div>
+    </div>
+    <div class="px-6 py-3 border-t border-slate-100 bg-slate-50 flex items-center justify-end gap-2">
+      <button onclick="closeModal('password-modal')" class="px-4 py-2 text-sm font-semibold text-slate-600">ยกเลิก</button>
+      <button onclick="closeModal('password-modal'); alert('เปลี่ยนรหัสผ่านเรียบร้อย');" class="bg-brand-900 text-white font-bold px-5 py-2 rounded-lg text-sm">เปลี่ยน</button>
+    </div>
+  </div>
+</div>
+
+<script>
+function openModal(id) { document.getElementById(id).classList.remove('hidden'); document.body.style.overflow = 'hidden'; setTimeout(() => lucide.createIcons(), 50); }
+function closeModal(id) { document.getElementById(id).classList.add('hidden'); document.body.style.overflow = ''; }
+function toggleSidebar() {
+  const sb = document.getElementById('sidebar');
+  if (!sb) return;
+  sb.classList.toggle('collapsed');
+  const icon = document.getElementById('sidebar-toggle-icon');
+  if (icon) {
+    icon.setAttribute('data-lucide', sb.classList.contains('collapsed') ? 'panel-left-open' : 'panel-left-close');
+    lucide.createIcons();
+  }
+}
+
+lucide.createIcons();
+</script>
+</body>
+</html>

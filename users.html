@@ -1,0 +1,467 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>IAD SmartCare — จัดการผู้ใช้</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@500;700&family=Noto+Sans+Thai:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+<script>
+tailwind.config = { theme: { extend: { colors: { brand: { 50:'#f0fdfa',100:'#ccfbf1',200:'#99f6e4',300:'#5eead4',400:'#2dd4bf',500:'#14b8a6',600:'#0d9488',700:'#0f766e',800:'#115e59',900:'#134e4a',950:'#042f2e' } }, fontFamily: { sans: ['Inter','Noto Sans Thai','system-ui','sans-serif'], mono: ['JetBrains Mono','monospace'] } } } }
+</script>
+<style>
+body { font-family: 'Inter','Noto Sans Thai',sans-serif; }
+.font-mono { font-family: 'JetBrains Mono',monospace; }
+.role-nurse { background: #f0fdfa; color: #0f766e; }
+.role-head { background: #ede9fe; color: #6d28d9; }
+.role-admin { background: #fff7ed; color: #c2410c; }
+.status-active { background: #ecfdf5; color: #047857; }
+.status-pending { background: #fef3c7; color: #b45309; }
+.status-disabled { background: #f1f5f9; color: #475569; }
+.modal-backdrop { background: rgba(15,23,42,0.5); backdrop-filter: blur(4px); }
+@keyframes modal-in { from { opacity: 0; transform: scale(0.95); } to { opacity: 1; transform: scale(1); } }
+.modal-content { animation: modal-in 0.2s ease-out; }
+
+/* Sidebar toggle */
+#sidebar { transition: margin-left 0.3s ease, opacity 0.2s ease; }
+#sidebar.collapsed { margin-left: -16rem; opacity: 0.4; pointer-events: none; }
+#sidebar-toggle-btn { transition: all 0.2s ease; }
+#sidebar-toggle-btn:hover { transform: scale(1.05); }
+</style>
+</head>
+<body class="bg-slate-50 min-h-screen">
+
+<!-- MOBILE -->
+<div class="md:hidden min-h-screen pb-24">
+  <div class="bg-white px-5 pt-5 pb-4 border-b border-slate-100 sticky top-0 z-20">
+    <div class="flex items-center justify-between mb-3">
+      <div class="flex items-center gap-3">
+        <a href="settings.html" class="w-9 h-9 rounded-full bg-slate-100 flex items-center justify-center">
+          <i data-lucide="arrow-left" class="w-4 h-4 text-slate-700"></i>
+        </a>
+        <div>
+          <h1 class="text-base font-bold text-slate-900">จัดการผู้ใช้</h1>
+          <p class="text-[11px] text-slate-500">7 คน · 2 รออนุมัติ</p>
+        </div>
+      </div>
+      <button onclick="openModal('add-user-modal')" class="w-9 h-9 bg-brand-900 rounded-lg flex items-center justify-center">
+        <i data-lucide="user-plus" class="w-4 h-4 text-white"></i>
+      </button>
+    </div>
+  </div>
+
+  <!-- Pending approvals -->
+  <div class="px-5 pt-5">
+    <div class="bg-gradient-to-br from-amber-50 to-orange-50 border border-amber-200 rounded-2xl p-4">
+      <div class="flex items-center gap-2 mb-3">
+        <div class="w-7 h-7 bg-amber-500 rounded-lg flex items-center justify-center"><i data-lucide="user-check" class="w-4 h-4 text-white"></i></div>
+        <h3 class="text-sm font-bold text-amber-900">รออนุมัติ 2 คน</h3>
+      </div>
+      <div class="space-y-2">
+        <div class="bg-white rounded-xl p-3">
+          <div class="flex items-center gap-3 mb-2">
+            <div class="w-9 h-9 bg-slate-200 rounded-full flex items-center justify-center text-slate-600 text-xs font-bold">สป</div>
+            <div class="flex-1 min-w-0">
+              <div class="text-sm font-bold text-slate-900">สมปอง ขยัน</div>
+              <div class="text-[11px] text-slate-500 font-mono">somp@hospital.go.th · 670089</div>
+            </div>
+          </div>
+          <div class="flex items-center gap-2 mb-2">
+            <span class="role-nurse text-[10px] font-bold px-1.5 py-0.5 rounded">พยาบาล</span>
+            <span class="text-[10px] text-slate-500">Ward 3A · 1 วันที่แล้ว</span>
+          </div>
+          <div class="flex gap-2">
+            <button class="flex-1 bg-emerald-600 text-white text-xs font-bold py-2 rounded-lg flex items-center justify-center gap-1"><i data-lucide="check" class="w-3 h-3"></i>อนุมัติ</button>
+            <button class="flex-1 bg-slate-100 text-slate-700 text-xs font-bold py-2 rounded-lg flex items-center justify-center gap-1"><i data-lucide="x" class="w-3 h-3"></i>ปฏิเสธ</button>
+          </div>
+        </div>
+        <div class="bg-white rounded-xl p-3">
+          <div class="flex items-center gap-3 mb-2">
+            <div class="w-9 h-9 bg-slate-200 rounded-full flex items-center justify-center text-slate-600 text-xs font-bold">วร</div>
+            <div class="flex-1 min-w-0">
+              <div class="text-sm font-bold text-slate-900">วรินทร ใจเย็น</div>
+              <div class="text-[11px] text-slate-500 font-mono">warin@hospital.go.th · 670102</div>
+            </div>
+          </div>
+          <div class="flex items-center gap-2 mb-2">
+            <span class="role-nurse text-[10px] font-bold px-1.5 py-0.5 rounded">พยาบาล</span>
+            <span class="text-[10px] text-slate-500">Ward 3A · 2 วัน</span>
+          </div>
+          <div class="flex gap-2">
+            <button class="flex-1 bg-emerald-600 text-white text-xs font-bold py-2 rounded-lg flex items-center justify-center gap-1"><i data-lucide="check" class="w-3 h-3"></i>อนุมัติ</button>
+            <button class="flex-1 bg-slate-100 text-slate-700 text-xs font-bold py-2 rounded-lg flex items-center justify-center gap-1"><i data-lucide="x" class="w-3 h-3"></i>ปฏิเสธ</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Active users -->
+  <div class="px-5 pt-4">
+    <h3 class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-3">ผู้ใช้ในระบบ</h3>
+    <div class="space-y-2">
+      <div class="bg-white rounded-xl p-3 border border-slate-100">
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 bg-brand-900 rounded-full flex items-center justify-center text-white text-xs font-bold">ณธ</div>
+          <div class="flex-1 min-w-0">
+            <div class="flex items-center gap-2">
+              <span class="text-sm font-bold text-slate-900">ณัฐธิดา ใจดี</span>
+              <span class="text-[10px] text-brand-700 font-semibold">(คุณ)</span>
+            </div>
+            <div class="text-[11px] text-slate-500 font-mono">nattida@hospital.go.th</div>
+            <div class="flex items-center gap-1.5 mt-1">
+              <span class="role-nurse text-[10px] font-bold px-1.5 py-0.5 rounded">พยาบาล</span>
+              <span class="status-active text-[10px] font-bold px-1.5 py-0.5 rounded">Active</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="bg-white rounded-xl p-3 border border-slate-100">
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 bg-purple-600 rounded-full flex items-center justify-center text-white text-xs font-bold">สน</div>
+          <div class="flex-1 min-w-0">
+            <div class="text-sm font-bold text-slate-900">สุพรนีย์ มีสุข</div>
+            <div class="text-[11px] text-slate-500 font-mono">supranee@hospital.go.th</div>
+            <div class="flex items-center gap-1.5 mt-1">
+              <span class="role-head text-[10px] font-bold px-1.5 py-0.5 rounded">หัวหน้าวอร์ด</span>
+              <span class="status-active text-[10px] font-bold px-1.5 py-0.5 rounded">Active</span>
+            </div>
+          </div>
+          <button class="text-slate-400"><i data-lucide="more-vertical" class="w-4 h-4"></i></button>
+        </div>
+      </div>
+      <div class="bg-white rounded-xl p-3 border border-slate-100">
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 bg-slate-600 rounded-full flex items-center justify-center text-white text-xs font-bold">มน</div>
+          <div class="flex-1 min-w-0">
+            <div class="text-sm font-bold text-slate-900">มาลี นวลใย</div>
+            <div class="text-[11px] text-slate-500 font-mono">malee@hospital.go.th</div>
+            <div class="flex items-center gap-1.5 mt-1">
+              <span class="role-nurse text-[10px] font-bold px-1.5 py-0.5 rounded">พยาบาล</span>
+              <span class="status-active text-[10px] font-bold px-1.5 py-0.5 rounded">Active</span>
+            </div>
+          </div>
+          <button class="text-slate-400"><i data-lucide="more-vertical" class="w-4 h-4"></i></button>
+        </div>
+      </div>
+      <div class="bg-white rounded-xl p-3 border border-slate-100 opacity-60">
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 bg-slate-400 rounded-full flex items-center justify-center text-white text-xs font-bold">ปก</div>
+          <div class="flex-1 min-w-0">
+            <div class="text-sm font-bold text-slate-700">ประกอบ สมใจ</div>
+            <div class="text-[11px] text-slate-500 font-mono">prakob@hospital.go.th</div>
+            <div class="flex items-center gap-1.5 mt-1">
+              <span class="role-nurse text-[10px] font-bold px-1.5 py-0.5 rounded">พยาบาล</span>
+              <span class="status-disabled text-[10px] font-bold px-1.5 py-0.5 rounded">ปิดใช้งาน</span>
+            </div>
+          </div>
+          <button class="text-slate-400"><i data-lucide="more-vertical" class="w-4 h-4"></i></button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Bottom Nav -->
+  <div class="fixed bottom-0 left-0 right-0 bg-white border-t border-slate-200 px-2 py-2 flex items-center justify-around z-30">
+    <a href="dashboard.html" class="flex flex-col items-center gap-1 px-4 py-1.5"><i data-lucide="home" class="w-5 h-5 text-slate-400"></i><span class="text-[10px] font-medium text-slate-500">หน้าหลัก</span></a>
+    <a href="patients.html" class="flex flex-col items-center gap-1 px-4 py-1.5"><i data-lucide="users" class="w-5 h-5 text-slate-400"></i><span class="text-[10px] font-medium text-slate-500">ผู้ป่วย</span></a>
+    <a href="assessment.html" class="flex flex-col items-center gap-1 -mt-6">
+      <div class="w-14 h-14 bg-brand-900 rounded-full flex items-center justify-center shadow-lg shadow-brand-900/30 ring-4 ring-white"><i data-lucide="plus" class="w-7 h-7 text-white"></i></div>
+    </a>
+    <a href="reports.html" class="flex flex-col items-center gap-1 px-4 py-1.5"><i data-lucide="bar-chart-3" class="w-5 h-5 text-slate-400"></i><span class="text-[10px] font-medium text-slate-500">รายงาน</span></a>
+    <a href="settings.html" class="flex flex-col items-center gap-1 px-4 py-1.5"><i data-lucide="settings" class="w-5 h-5 text-slate-400"></i><span class="text-[10px] font-medium text-slate-500">ตั้งค่า</span></a>
+  </div>
+</div>
+
+<!-- DESKTOP -->
+<div class="hidden md:flex min-h-screen">
+  <aside id="sidebar" class="w-64 bg-white border-r border-slate-200 flex flex-col">
+    <div class="p-6 border-b border-slate-100">
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 bg-brand-900 rounded-xl flex items-center justify-center"><i data-lucide="shield-plus" class="w-5 h-5 text-white"></i></div>
+        <div><h1 class="text-sm font-bold text-slate-900">IAD SmartCare</h1><p class="text-[10px] text-slate-500 uppercase tracking-wider">Admin · Ward 3A</p></div>
+      </div>
+    </div>
+    <nav class="flex-1 p-4 space-y-1">
+      <a href="dashboard.html" class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-600 hover:bg-slate-50"><i data-lucide="home" class="w-5 h-5"></i><span class="text-sm">หน้าหลัก</span></a>
+      <a href="patients.html" class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-600 hover:bg-slate-50"><i data-lucide="users" class="w-5 h-5"></i><span class="text-sm">ผู้ป่วย</span></a>
+      <a href="assessment.html" class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-600 hover:bg-slate-50"><i data-lucide="clipboard-check" class="w-5 h-5"></i><span class="text-sm">ประเมินใหม่</span></a>
+      <a href="reports.html" class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-600 hover:bg-slate-50"><i data-lucide="bar-chart-3" class="w-5 h-5"></i><span class="text-sm">รายงาน</span></a>
+      <div class="pt-4 mt-4 border-t border-slate-100">
+        <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider px-3 mb-2">ระบบ</p>
+        <a href="users.html" class="flex items-center gap-3 px-3 py-2.5 rounded-lg bg-brand-50 text-brand-900 font-semibold"><i data-lucide="user-cog" class="w-5 h-5"></i><span class="text-sm">จัดการผู้ใช้</span><span class="ml-auto text-[10px] bg-amber-500 text-white px-1.5 py-0.5 rounded-full font-bold">2</span></a>
+        <a href="settings.html" class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-600 hover:bg-slate-50"><i data-lucide="settings" class="w-5 h-5"></i><span class="text-sm">ตั้งค่า</span></a>
+      </div>
+    </nav>
+  </aside>
+
+  <main class="flex-1 overflow-auto relative">
+    <button id="sidebar-toggle-btn" onclick="toggleSidebar()" class="hidden md:flex absolute top-3.5 left-3 z-30 w-9 h-9 rounded-lg bg-white hover:bg-slate-100 border border-slate-200 shadow-sm items-center justify-center" title="ซ่อน/แสดงเมนู">
+      <i data-lucide="panel-left-close" id="sidebar-toggle-icon" class="w-4 h-4 text-slate-700"></i>
+    </button>
+    <header class="bg-white border-b border-slate-100 pl-16 pr-8 py-4 flex items-center justify-between sticky top-0 z-20">
+      <div>
+        <h2 class="text-xl font-bold text-slate-900">จัดการผู้ใช้</h2>
+        <p class="text-sm text-slate-500 mt-0.5">7 ผู้ใช้ในระบบ · 2 รออนุมัติ</p>
+      </div>
+      <button onclick="openModal('add-user-modal')" class="bg-brand-900 hover:bg-brand-950 text-white font-bold px-5 py-2 rounded-lg flex items-center gap-2 text-sm shadow-lg shadow-brand-900/20">
+        <i data-lucide="user-plus" class="w-4 h-4"></i>เพิ่มผู้ใช้
+      </button>
+    </header>
+
+    <div class="p-8 space-y-6">
+      <!-- Pending approvals banner -->
+      <div class="bg-gradient-to-br from-amber-50 to-orange-50 border border-amber-200 rounded-2xl p-6">
+        <div class="flex items-center justify-between mb-5">
+          <div class="flex items-center gap-3">
+            <div class="w-10 h-10 bg-amber-500 rounded-lg flex items-center justify-center"><i data-lucide="user-check" class="w-5 h-5 text-white"></i></div>
+            <div>
+              <h3 class="text-base font-bold text-amber-900">รออนุมัติ 2 คำขอ</h3>
+              <p class="text-xs text-amber-700 mt-0.5">ตรวจสอบและอนุมัติเพื่อให้ใช้งานระบบ</p>
+            </div>
+          </div>
+        </div>
+        <div class="space-y-2">
+          <div class="bg-white rounded-xl p-4 flex items-center gap-4">
+            <div class="w-12 h-12 bg-slate-200 rounded-full flex items-center justify-center text-slate-600 text-sm font-bold">สป</div>
+            <div class="flex-1 min-w-0">
+              <div class="flex items-center gap-2">
+                <span class="text-sm font-bold text-slate-900">สมปอง ขยัน</span>
+                <span class="role-nurse text-[10px] font-bold px-1.5 py-0.5 rounded">พยาบาล</span>
+              </div>
+              <div class="text-xs text-slate-500 mt-0.5 font-mono">somp@hospital.go.th · 670089 · Ward 3A</div>
+              <div class="text-[11px] text-slate-400 mt-0.5">ส่งคำขอเมื่อ 1 วันที่แล้ว</div>
+            </div>
+            <div class="flex gap-2">
+              <button class="px-3 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold rounded-lg flex items-center gap-1"><i data-lucide="x" class="w-3 h-3"></i>ปฏิเสธ</button>
+              <button onclick="alert('อนุมัติเรียบร้อย');" class="px-3 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold rounded-lg flex items-center gap-1"><i data-lucide="check" class="w-3 h-3"></i>อนุมัติ</button>
+            </div>
+          </div>
+          <div class="bg-white rounded-xl p-4 flex items-center gap-4">
+            <div class="w-12 h-12 bg-slate-200 rounded-full flex items-center justify-center text-slate-600 text-sm font-bold">วร</div>
+            <div class="flex-1 min-w-0">
+              <div class="flex items-center gap-2">
+                <span class="text-sm font-bold text-slate-900">วรินทร ใจเย็น</span>
+                <span class="role-nurse text-[10px] font-bold px-1.5 py-0.5 rounded">พยาบาล</span>
+              </div>
+              <div class="text-xs text-slate-500 mt-0.5 font-mono">warin@hospital.go.th · 670102 · Ward 3A</div>
+              <div class="text-[11px] text-slate-400 mt-0.5">ส่งคำขอเมื่อ 2 วันที่แล้ว</div>
+            </div>
+            <div class="flex gap-2">
+              <button class="px-3 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold rounded-lg flex items-center gap-1"><i data-lucide="x" class="w-3 h-3"></i>ปฏิเสธ</button>
+              <button onclick="alert('อนุมัติเรียบร้อย');" class="px-3 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold rounded-lg flex items-center gap-1"><i data-lucide="check" class="w-3 h-3"></i>อนุมัติ</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Users table -->
+      <div class="bg-white rounded-2xl border border-slate-100 overflow-hidden">
+        <div class="px-6 py-4 border-b border-slate-100 flex items-center justify-between">
+          <h3 class="text-base font-bold text-slate-900">ผู้ใช้ทั้งหมด</h3>
+          <div class="flex gap-2">
+            <div class="relative">
+              <i data-lucide="search" class="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2"></i>
+              <input type="text" placeholder="ค้นหาผู้ใช้..." class="w-64 bg-slate-50 border border-slate-200 rounded-lg pl-10 pr-4 py-2 text-sm focus:outline-none focus:border-brand-700">
+            </div>
+            <select class="bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 text-sm">
+              <option>ทุก role</option><option>พยาบาล</option><option>หัวหน้าวอร์ด</option><option>Admin</option>
+            </select>
+          </div>
+        </div>
+        <table class="w-full text-sm">
+          <thead class="bg-slate-50 text-xs uppercase tracking-wider text-slate-500">
+            <tr>
+              <th class="px-6 py-3 text-left font-semibold">ผู้ใช้</th>
+              <th class="px-6 py-3 text-left font-semibold">รหัส / อีเมล</th>
+              <th class="px-6 py-3 text-left font-semibold">บทบาท</th>
+              <th class="px-6 py-3 text-left font-semibold">หอผู้ป่วย</th>
+              <th class="px-6 py-3 text-left font-semibold">สถานะ</th>
+              <th class="px-6 py-3 text-left font-semibold">ใช้ครั้งล่าสุด</th>
+              <th class="px-6 py-3"></th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-slate-100">
+            <tr class="hover:bg-slate-50">
+              <td class="px-6 py-3">
+                <div class="flex items-center gap-3">
+                  <div class="w-9 h-9 bg-brand-900 rounded-full flex items-center justify-center text-white text-xs font-bold">ณธ</div>
+                  <div>
+                    <div class="text-sm font-bold text-slate-900">ณัฐธิดา ใจดี <span class="text-[10px] text-brand-700">(คุณ)</span></div>
+                  </div>
+                </div>
+              </td>
+              <td class="px-6 py-3"><div class="text-xs text-slate-700 font-mono">670045</div><div class="text-[11px] text-slate-500">nattida@hospital.go.th</div></td>
+              <td class="px-6 py-3"><span class="role-nurse text-[11px] font-bold px-2 py-0.5 rounded">พยาบาล</span></td>
+              <td class="px-6 py-3 text-xs text-slate-700">Ward 3A</td>
+              <td class="px-6 py-3"><span class="status-active text-[11px] font-bold px-2 py-0.5 rounded">Active</span></td>
+              <td class="px-6 py-3 text-xs text-slate-500 font-mono">ตอนนี้</td>
+              <td class="px-6 py-3"><button class="text-slate-400 hover:text-slate-700"><i data-lucide="more-vertical" class="w-4 h-4"></i></button></td>
+            </tr>
+            <tr class="hover:bg-slate-50">
+              <td class="px-6 py-3">
+                <div class="flex items-center gap-3">
+                  <div class="w-9 h-9 bg-purple-600 rounded-full flex items-center justify-center text-white text-xs font-bold">สน</div>
+                  <div><div class="text-sm font-bold text-slate-900">สุพรนีย์ มีสุข</div></div>
+                </div>
+              </td>
+              <td class="px-6 py-3"><div class="text-xs text-slate-700 font-mono">670001</div><div class="text-[11px] text-slate-500">supranee@hospital.go.th</div></td>
+              <td class="px-6 py-3"><span class="role-head text-[11px] font-bold px-2 py-0.5 rounded">หัวหน้าวอร์ด</span></td>
+              <td class="px-6 py-3 text-xs text-slate-700">Ward 3A</td>
+              <td class="px-6 py-3"><span class="status-active text-[11px] font-bold px-2 py-0.5 rounded">Active</span></td>
+              <td class="px-6 py-3 text-xs text-slate-500 font-mono">2 ชม.</td>
+              <td class="px-6 py-3"><button onclick="openModal('edit-user-modal')" class="text-slate-400 hover:text-slate-700"><i data-lucide="more-vertical" class="w-4 h-4"></i></button></td>
+            </tr>
+            <tr class="hover:bg-slate-50">
+              <td class="px-6 py-3">
+                <div class="flex items-center gap-3">
+                  <div class="w-9 h-9 bg-slate-600 rounded-full flex items-center justify-center text-white text-xs font-bold">มน</div>
+                  <div><div class="text-sm font-bold text-slate-900">มาลี นวลใย</div></div>
+                </div>
+              </td>
+              <td class="px-6 py-3"><div class="text-xs text-slate-700 font-mono">670012</div><div class="text-[11px] text-slate-500">malee@hospital.go.th</div></td>
+              <td class="px-6 py-3"><span class="role-nurse text-[11px] font-bold px-2 py-0.5 rounded">พยาบาล</span></td>
+              <td class="px-6 py-3 text-xs text-slate-700">Ward 3A</td>
+              <td class="px-6 py-3"><span class="status-active text-[11px] font-bold px-2 py-0.5 rounded">Active</span></td>
+              <td class="px-6 py-3 text-xs text-slate-500 font-mono">5 ชม.</td>
+              <td class="px-6 py-3"><button class="text-slate-400 hover:text-slate-700"><i data-lucide="more-vertical" class="w-4 h-4"></i></button></td>
+            </tr>
+            <tr class="hover:bg-slate-50">
+              <td class="px-6 py-3">
+                <div class="flex items-center gap-3">
+                  <div class="w-9 h-9 bg-rose-500 rounded-full flex items-center justify-center text-white text-xs font-bold">วน</div>
+                  <div><div class="text-sm font-bold text-slate-900">วันดี ดีงาม</div></div>
+                </div>
+              </td>
+              <td class="px-6 py-3"><div class="text-xs text-slate-700 font-mono">670023</div><div class="text-[11px] text-slate-500">wandee@hospital.go.th</div></td>
+              <td class="px-6 py-3"><span class="role-nurse text-[11px] font-bold px-2 py-0.5 rounded">พยาบาล</span></td>
+              <td class="px-6 py-3 text-xs text-slate-700">Ward 3A</td>
+              <td class="px-6 py-3"><span class="status-active text-[11px] font-bold px-2 py-0.5 rounded">Active</span></td>
+              <td class="px-6 py-3 text-xs text-slate-500 font-mono">1 วัน</td>
+              <td class="px-6 py-3"><button class="text-slate-400 hover:text-slate-700"><i data-lucide="more-vertical" class="w-4 h-4"></i></button></td>
+            </tr>
+            <tr class="hover:bg-slate-50">
+              <td class="px-6 py-3">
+                <div class="flex items-center gap-3">
+                  <div class="w-9 h-9 bg-orange-600 rounded-full flex items-center justify-center text-white text-xs font-bold">อด</div>
+                  <div><div class="text-sm font-bold text-slate-900">Admin ระบบ</div></div>
+                </div>
+              </td>
+              <td class="px-6 py-3"><div class="text-xs text-slate-700 font-mono">000001</div><div class="text-[11px] text-slate-500">admin@hospital.go.th</div></td>
+              <td class="px-6 py-3"><span class="role-admin text-[11px] font-bold px-2 py-0.5 rounded">Admin</span></td>
+              <td class="px-6 py-3 text-xs text-slate-700">-</td>
+              <td class="px-6 py-3"><span class="status-active text-[11px] font-bold px-2 py-0.5 rounded">Active</span></td>
+              <td class="px-6 py-3 text-xs text-slate-500 font-mono">7 วัน</td>
+              <td class="px-6 py-3"><button class="text-slate-400 hover:text-slate-700"><i data-lucide="more-vertical" class="w-4 h-4"></i></button></td>
+            </tr>
+            <tr class="hover:bg-slate-50 opacity-60">
+              <td class="px-6 py-3">
+                <div class="flex items-center gap-3">
+                  <div class="w-9 h-9 bg-slate-400 rounded-full flex items-center justify-center text-white text-xs font-bold">ปก</div>
+                  <div><div class="text-sm font-bold text-slate-700">ประกอบ สมใจ</div></div>
+                </div>
+              </td>
+              <td class="px-6 py-3"><div class="text-xs text-slate-700 font-mono">670034</div><div class="text-[11px] text-slate-500">prakob@hospital.go.th</div></td>
+              <td class="px-6 py-3"><span class="role-nurse text-[11px] font-bold px-2 py-0.5 rounded">พยาบาล</span></td>
+              <td class="px-6 py-3 text-xs text-slate-700">Ward 3A</td>
+              <td class="px-6 py-3"><span class="status-disabled text-[11px] font-bold px-2 py-0.5 rounded">ปิดใช้งาน</span></td>
+              <td class="px-6 py-3 text-xs text-slate-500 font-mono">30 วัน</td>
+              <td class="px-6 py-3"><button class="text-slate-400 hover:text-slate-700"><i data-lucide="more-vertical" class="w-4 h-4"></i></button></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </main>
+</div>
+
+<!-- MODAL: Add user -->
+<div id="add-user-modal" class="hidden fixed inset-0 modal-backdrop z-50 flex items-end md:items-center justify-center p-0 md:p-6" onclick="if(event.target===this) closeModal('add-user-modal')">
+  <div class="modal-content bg-white rounded-t-3xl md:rounded-2xl w-full max-w-lg max-h-[90vh] overflow-hidden flex flex-col">
+    <div class="px-6 py-4 border-b border-slate-100 flex items-center justify-between">
+      <div>
+        <h3 class="text-base font-bold text-slate-900">เพิ่มผู้ใช้ใหม่</h3>
+        <p class="text-xs text-slate-500 mt-0.5">ระบบจะส่งอีเมลเชิญพร้อมรหัสผ่านชั่วคราว</p>
+      </div>
+      <button onclick="closeModal('add-user-modal')" class="w-8 h-8 rounded-full hover:bg-slate-100 flex items-center justify-center"><i data-lucide="x" class="w-4 h-4 text-slate-500"></i></button>
+    </div>
+    <div class="flex-1 overflow-y-auto p-6 space-y-4">
+      <div class="grid grid-cols-2 gap-3">
+        <div><label class="text-xs font-semibold text-slate-700 mb-1.5 block">ชื่อ-สกุล *</label><input type="text" placeholder="เช่น สมปอง ขยัน" class="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:border-brand-700"></div>
+        <div><label class="text-xs font-semibold text-slate-700 mb-1.5 block">รหัสพนักงาน *</label><input type="text" placeholder="670XXX" class="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2.5 text-sm font-mono focus:outline-none focus:border-brand-700"></div>
+      </div>
+      <div><label class="text-xs font-semibold text-slate-700 mb-1.5 block">อีเมล *</label><input type="email" placeholder="nurse@hospital.go.th" class="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:border-brand-700"></div>
+      <div>
+        <label class="text-xs font-semibold text-slate-700 mb-1.5 block">บทบาท *</label>
+        <div class="grid grid-cols-2 gap-2">
+          <label class="border-2 border-brand-700 bg-brand-50 rounded-lg p-3 cursor-pointer flex items-center gap-2">
+            <input type="radio" name="role" checked class="accent-brand-700">
+            <div><div class="text-sm font-bold text-slate-900">พยาบาล</div><div class="text-[10px] text-slate-500">บันทึก/ประเมิน</div></div>
+          </label>
+          <label class="border-2 border-slate-200 rounded-lg p-3 cursor-pointer flex items-center gap-2 hover:border-brand-700">
+            <input type="radio" name="role" class="accent-brand-700">
+            <div><div class="text-sm font-bold text-slate-900">หัวหน้าวอร์ด</div><div class="text-[10px] text-slate-500">อนุมัติ + รายงาน</div></div>
+          </label>
+        </div>
+      </div>
+      <div><label class="text-xs font-semibold text-slate-700 mb-1.5 block">หอผู้ป่วย *</label>
+        <select class="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:border-brand-700">
+          <option selected>Ward 3A — อายุรกรรม</option><option>Ward 3B — อายุรกรรม</option><option>Ward 5C — ICU</option>
+        </select>
+      </div>
+      <div class="bg-blue-50 border border-blue-200 rounded-lg p-3 flex items-start gap-2">
+        <i data-lucide="mail" class="w-4 h-4 text-blue-700 flex-shrink-0 mt-0.5"></i>
+        <p class="text-xs text-blue-900 leading-relaxed">ผู้ใช้จะได้รับอีเมลพร้อมรหัสผ่านชั่วคราว และต้องเปลี่ยนรหัสผ่านในการเข้าใช้งานครั้งแรก</p>
+      </div>
+    </div>
+    <div class="px-6 py-3 border-t border-slate-100 bg-slate-50 flex items-center justify-end gap-2">
+      <button onclick="closeModal('add-user-modal')" class="px-4 py-2 text-sm font-semibold text-slate-600">ยกเลิก</button>
+      <button onclick="closeModal('add-user-modal'); alert('ส่งคำเชิญเรียบร้อย');" class="bg-brand-900 hover:bg-brand-950 text-white font-bold px-5 py-2 rounded-lg text-sm flex items-center gap-2">
+        <i data-lucide="send" class="w-4 h-4"></i>ส่งคำเชิญ
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: Edit user (action menu) -->
+<div id="edit-user-modal" class="hidden fixed inset-0 modal-backdrop z-50 flex items-center justify-center p-6" onclick="if(event.target===this) closeModal('edit-user-modal')">
+  <div class="modal-content bg-white rounded-2xl w-full max-w-sm overflow-hidden">
+    <div class="px-6 py-5 border-b border-slate-100 flex items-center gap-3">
+      <div class="w-12 h-12 bg-purple-600 rounded-full flex items-center justify-center text-white text-sm font-bold">สน</div>
+      <div>
+        <div class="text-sm font-bold text-slate-900">สุพรนีย์ มีสุข</div>
+        <div class="text-xs text-slate-500">หัวหน้าวอร์ด · Ward 3A</div>
+      </div>
+    </div>
+    <div class="p-2">
+      <button class="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-700 hover:bg-slate-50 text-sm"><i data-lucide="user-pen" class="w-4 h-4"></i>แก้ไขข้อมูล</button>
+      <button class="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-700 hover:bg-slate-50 text-sm"><i data-lucide="shield" class="w-4 h-4"></i>เปลี่ยน role</button>
+      <button class="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-700 hover:bg-slate-50 text-sm"><i data-lucide="key-round" class="w-4 h-4"></i>รีเซ็ตรหัสผ่าน</button>
+      <button class="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-amber-700 hover:bg-amber-50 text-sm"><i data-lucide="user-x" class="w-4 h-4"></i>ปิดใช้งานชั่วคราว</button>
+      <button class="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-red-700 hover:bg-red-50 text-sm"><i data-lucide="trash-2" class="w-4 h-4"></i>ลบผู้ใช้</button>
+    </div>
+    <div class="px-6 py-3 border-t border-slate-100 bg-slate-50">
+      <button onclick="closeModal('edit-user-modal')" class="w-full text-xs font-bold text-slate-600 py-1">ปิด</button>
+    </div>
+  </div>
+</div>
+
+<script>
+function openModal(id) { document.getElementById(id).classList.remove('hidden'); document.body.style.overflow = 'hidden'; setTimeout(() => lucide.createIcons(), 50); }
+function closeModal(id) { document.getElementById(id).classList.add('hidden'); document.body.style.overflow = ''; }
+function toggleSidebar() {
+  const sb = document.getElementById('sidebar');
+  if (!sb) return;
+  sb.classList.toggle('collapsed');
+  const icon = document.getElementById('sidebar-toggle-icon');
+  if (icon) {
+    icon.setAttribute('data-lucide', sb.classList.contains('collapsed') ? 'panel-left-open' : 'panel-left-close');
+    lucide.createIcons();
+  }
+}
+
+lucide.createIcons();
+</script>
+</body>
+</html>

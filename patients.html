@@ -1,0 +1,415 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>IAD SmartCare — รายชื่อผู้ป่วย</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@500;700&family=Noto+Sans+Thai:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+<script>
+tailwind.config = { theme: { extend: { colors: { brand: { 50:'#f0fdfa',100:'#ccfbf1',200:'#99f6e4',300:'#5eead4',400:'#2dd4bf',500:'#14b8a6',600:'#0d9488',700:'#0f766e',800:'#115e59',900:'#134e4a',950:'#042f2e' } }, fontFamily: { sans: ['Inter','Noto Sans Thai','system-ui','sans-serif'], mono: ['JetBrains Mono','monospace'] } } } }
+</script>
+<style>
+body { font-family: 'Inter', 'Noto Sans Thai', sans-serif; }
+.font-mono { font-family: 'JetBrains Mono', monospace; }
+.no-scrollbar::-webkit-scrollbar { display: none; }
+.no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+.severity-1a { background: #ecfdf5; color: #047857; }
+.severity-1b { background: #fef3c7; color: #b45309; }
+.severity-2a { background: #ffedd5; color: #c2410c; }
+.severity-2b { background: #fee2e2; color: #b91c1c; }
+.chip { padding: 6px 12px; border-radius: 999px; font-size: 12px; font-weight: 600; white-space: nowrap; cursor: pointer; transition: all 0.15s; }
+.chip-inactive { background: white; color: #475569; border: 1px solid #e2e8f0; }
+.chip-active { background: #134e4a; color: white; border: 1px solid #134e4a; }
+.modal-backdrop { background: rgba(15,23,42,0.5); backdrop-filter: blur(4px); }
+@keyframes modal-in { from { opacity: 0; transform: scale(0.95) translateY(8px); } to { opacity: 1; transform: scale(1) translateY(0); } }
+.modal-content { animation: modal-in 0.2s ease-out; }
+
+/* Sidebar toggle */
+#sidebar { transition: margin-left 0.3s ease, opacity 0.2s ease; }
+#sidebar.collapsed { margin-left: -16rem; opacity: 0.4; pointer-events: none; }
+#sidebar-toggle-btn { transition: all 0.2s ease; }
+#sidebar-toggle-btn:hover { transform: scale(1.05); }
+</style>
+</head>
+<body class="bg-slate-50 min-h-screen">
+
+<!-- MOBILE -->
+<div class="md:hidden min-h-screen pb-24">
+  <div class="bg-white px-5 pt-5 pb-3 border-b border-slate-100 sticky top-0 z-20">
+    <div class="flex items-center justify-between mb-3">
+      <div class="flex items-center gap-3">
+        <a href="dashboard.html" class="w-9 h-9 rounded-full bg-slate-100 flex items-center justify-center">
+          <i data-lucide="arrow-left" class="w-4 h-4 text-slate-700"></i>
+        </a>
+        <div>
+          <h1 class="text-base font-bold text-slate-900">ผู้ป่วยทั้งหมด</h1>
+          <p class="text-[11px] text-slate-500">18 ราย · Ward 3A</p>
+        </div>
+      </div>
+      <button onclick="openModal('add-patient-modal')" class="w-9 h-9 bg-brand-900 rounded-lg flex items-center justify-center">
+        <i data-lucide="plus" class="w-5 h-5 text-white"></i>
+      </button>
+    </div>
+    <div class="relative">
+      <i data-lucide="search" class="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2"></i>
+      <input type="text" placeholder="ค้นหาด้วย HN หรือ AN..." class="w-full bg-slate-50 border border-slate-200 rounded-xl pl-10 pr-4 py-2.5 text-sm focus:outline-none focus:border-brand-700 focus:bg-white">
+    </div>
+    <div class="flex gap-2 mt-3 overflow-x-auto no-scrollbar">
+      <button class="chip chip-active">ทั้งหมด · 18</button>
+      <button class="chip chip-inactive">Cat 1A · 8</button>
+      <button class="chip chip-inactive">Cat 1B · 5</button>
+      <button class="chip chip-inactive">Cat 2A · 3</button>
+      <button class="chip chip-inactive">Cat 2B · 2</button>
+    </div>
+  </div>
+
+  <div class="px-5 pt-4 space-y-2">
+    <a href="patient-detail.html" class="block bg-white rounded-xl p-3 border border-slate-100">
+      <div class="flex items-center gap-3">
+        <div class="w-12 h-12 bg-slate-100 rounded-xl flex items-center justify-center flex-shrink-0">
+          <i data-lucide="user" class="w-6 h-6 text-slate-500"></i>
+        </div>
+        <div class="flex-1 min-w-0">
+          <div class="flex items-center gap-2">
+            <span class="font-mono text-sm font-bold text-slate-900">HN 670012</span>
+            <span class="severity-1b text-[10px] font-bold px-1.5 py-0.5 rounded">Cat 1B</span>
+          </div>
+          <div class="text-[11px] text-slate-500 mt-0.5">หญิง, 72 ปี · เตียง 15 · AN 670/12345</div>
+          <div class="flex items-center gap-2 mt-1">
+            <span class="text-[10px] text-orange-700 font-semibold flex items-center gap-0.5"><i data-lucide="trending-up" class="w-2.5 h-2.5"></i>แย่ลง</span>
+            <span class="text-[10px] text-slate-400">·</span>
+            <span class="text-[10px] text-slate-500">2 ชม.</span>
+          </div>
+        </div>
+        <i data-lucide="chevron-right" class="w-4 h-4 text-slate-400 flex-shrink-0"></i>
+      </div>
+    </a>
+
+    <a href="patient-detail.html" class="block bg-white rounded-xl p-3 border border-slate-100">
+      <div class="flex items-center gap-3">
+        <div class="w-12 h-12 bg-slate-100 rounded-xl flex items-center justify-center flex-shrink-0">
+          <i data-lucide="user" class="w-6 h-6 text-slate-500"></i>
+        </div>
+        <div class="flex-1 min-w-0">
+          <div class="flex items-center gap-2">
+            <span class="font-mono text-sm font-bold text-slate-900">HN 670045</span>
+            <span class="severity-2a text-[10px] font-bold px-1.5 py-0.5 rounded">Cat 2A</span>
+          </div>
+          <div class="text-[11px] text-slate-500 mt-0.5">ชาย, 68 ปี · เตียง 22 · AN 670/12378</div>
+          <div class="flex items-center gap-2 mt-1">
+            <span class="text-[10px] text-slate-500 font-semibold flex items-center gap-0.5"><i data-lucide="minus" class="w-2.5 h-2.5"></i>คงที่</span>
+            <span class="text-[10px] text-slate-400">·</span>
+            <span class="text-[10px] text-slate-500">4 ชม.</span>
+          </div>
+        </div>
+        <i data-lucide="chevron-right" class="w-4 h-4 text-slate-400 flex-shrink-0"></i>
+      </div>
+    </a>
+
+    <a href="patient-detail.html" class="block bg-white rounded-xl p-3 border border-slate-100">
+      <div class="flex items-center gap-3">
+        <div class="w-12 h-12 bg-slate-100 rounded-xl flex items-center justify-center flex-shrink-0">
+          <i data-lucide="user" class="w-6 h-6 text-slate-500"></i>
+        </div>
+        <div class="flex-1 min-w-0">
+          <div class="flex items-center gap-2">
+            <span class="font-mono text-sm font-bold text-slate-900">HN 670089</span>
+            <span class="severity-1a text-[10px] font-bold px-1.5 py-0.5 rounded">Cat 1A</span>
+          </div>
+          <div class="text-[11px] text-slate-500 mt-0.5">หญิง, 81 ปี · เตียง 8 · AN 670/12401</div>
+          <div class="flex items-center gap-2 mt-1">
+            <span class="text-[10px] text-emerald-700 font-semibold flex items-center gap-0.5"><i data-lucide="trending-down" class="w-2.5 h-2.5"></i>ดีขึ้น</span>
+            <span class="text-[10px] text-slate-400">·</span>
+            <span class="text-[10px] text-slate-500">เมื่อวาน</span>
+          </div>
+        </div>
+        <i data-lucide="chevron-right" class="w-4 h-4 text-slate-400 flex-shrink-0"></i>
+      </div>
+    </a>
+
+    <a href="patient-detail.html" class="block bg-white rounded-xl p-3 border border-slate-100">
+      <div class="flex items-center gap-3">
+        <div class="w-12 h-12 bg-slate-100 rounded-xl flex items-center justify-center flex-shrink-0">
+          <i data-lucide="user" class="w-6 h-6 text-slate-500"></i>
+        </div>
+        <div class="flex-1 min-w-0">
+          <div class="flex items-center gap-2">
+            <span class="font-mono text-sm font-bold text-slate-900">HN 670102</span>
+            <span class="severity-2b text-[10px] font-bold px-1.5 py-0.5 rounded">Cat 2B</span>
+          </div>
+          <div class="text-[11px] text-slate-500 mt-0.5">หญิง, 65 ปี · เตียง 11 · AN 670/12450</div>
+          <div class="flex items-center gap-2 mt-1">
+            <span class="text-[10px] text-red-700 font-semibold flex items-center gap-0.5"><i data-lucide="trending-up" class="w-2.5 h-2.5"></i>เฝ้าระวัง</span>
+            <span class="text-[10px] text-slate-400">·</span>
+            <span class="text-[10px] text-slate-500">เมื่อวาน</span>
+          </div>
+        </div>
+        <i data-lucide="chevron-right" class="w-4 h-4 text-slate-400 flex-shrink-0"></i>
+      </div>
+    </a>
+  </div>
+
+  <!-- Bottom Nav -->
+  <div class="fixed bottom-0 left-0 right-0 bg-white border-t border-slate-200 px-2 py-2 flex items-center justify-around z-30">
+    <a href="dashboard.html" class="flex flex-col items-center gap-1 px-4 py-1.5">
+      <i data-lucide="home" class="w-5 h-5 text-slate-400"></i>
+      <span class="text-[10px] font-medium text-slate-500">หน้าหลัก</span>
+    </a>
+    <a href="patients.html" class="flex flex-col items-center gap-1 px-4 py-1.5">
+      <i data-lucide="users" class="w-5 h-5 text-brand-700"></i>
+      <span class="text-[10px] font-bold text-brand-700">ผู้ป่วย</span>
+    </a>
+    <a href="assessment.html" class="flex flex-col items-center gap-1 -mt-6">
+      <div class="w-14 h-14 bg-brand-900 rounded-full flex items-center justify-center shadow-lg shadow-brand-900/30 ring-4 ring-white">
+        <i data-lucide="plus" class="w-7 h-7 text-white"></i>
+      </div>
+    </a>
+    <a href="reports.html" class="flex flex-col items-center gap-1 px-4 py-1.5">
+      <i data-lucide="bar-chart-3" class="w-5 h-5 text-slate-400"></i>
+      <span class="text-[10px] font-medium text-slate-500">รายงาน</span>
+    </a>
+    <a href="settings.html" class="flex flex-col items-center gap-1 px-4 py-1.5">
+      <i data-lucide="settings" class="w-5 h-5 text-slate-400"></i>
+      <span class="text-[10px] font-medium text-slate-500">ตั้งค่า</span>
+    </a>
+  </div>
+</div>
+
+<!-- DESKTOP -->
+<div class="hidden md:flex min-h-screen">
+  <aside id="sidebar" class="w-64 bg-white border-r border-slate-200 flex flex-col">
+    <div class="p-6 border-b border-slate-100">
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 bg-brand-900 rounded-xl flex items-center justify-center">
+          <i data-lucide="shield-plus" class="w-5 h-5 text-white"></i>
+        </div>
+        <div>
+          <h1 class="text-sm font-bold text-slate-900">IAD SmartCare</h1>
+          <p class="text-[10px] text-slate-500 uppercase tracking-wider">Ward 3A</p>
+        </div>
+      </div>
+    </div>
+    <nav class="flex-1 p-4 space-y-1">
+      <a href="dashboard.html" class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-600 hover:bg-slate-50"><i data-lucide="home" class="w-5 h-5"></i><span class="text-sm">หน้าหลัก</span></a>
+      <a href="patients.html" class="flex items-center gap-3 px-3 py-2.5 rounded-lg bg-brand-50 text-brand-900 font-semibold"><i data-lucide="users" class="w-5 h-5"></i><span class="text-sm">ผู้ป่วย</span><span class="ml-auto text-[10px] bg-brand-700 text-white px-1.5 py-0.5 rounded font-bold">18</span></a>
+      <a href="assessment.html" class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-600 hover:bg-slate-50"><i data-lucide="clipboard-check" class="w-5 h-5"></i><span class="text-sm">ประเมินใหม่</span></a>
+      <a href="reports.html" class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-600 hover:bg-slate-50"><i data-lucide="bar-chart-3" class="w-5 h-5"></i><span class="text-sm">รายงาน</span></a>
+      <div class="pt-4 mt-4 border-t border-slate-100">
+        <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider px-3 mb-2">ระบบ</p>
+        <a href="users.html" class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-600 hover:bg-slate-50"><i data-lucide="user-cog" class="w-5 h-5"></i><span class="text-sm">จัดการผู้ใช้</span></a>
+        <a href="settings.html" class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-600 hover:bg-slate-50"><i data-lucide="settings" class="w-5 h-5"></i><span class="text-sm">ตั้งค่า</span></a>
+      </div>
+    </nav>
+    <div class="p-4 border-t border-slate-100">
+      <div class="flex items-center gap-3 p-2 rounded-lg">
+        <div class="w-9 h-9 bg-brand-900 rounded-full flex items-center justify-center text-white text-xs font-bold">ณธ</div>
+        <div class="flex-1 min-w-0">
+          <div class="text-sm font-bold text-slate-900 truncate">ณัฐธิดา ใจดี</div>
+          <div class="text-[10px] text-slate-500 truncate">พยาบาลประจำการ</div>
+        </div>
+      </div>
+    </div>
+  </aside>
+
+  <main class="flex-1 overflow-auto relative">
+    <button id="sidebar-toggle-btn" onclick="toggleSidebar()" class="hidden md:flex absolute top-3.5 left-3 z-30 w-9 h-9 rounded-lg bg-white hover:bg-slate-100 border border-slate-200 shadow-sm items-center justify-center" title="ซ่อน/แสดงเมนู">
+      <i data-lucide="panel-left-close" id="sidebar-toggle-icon" class="w-4 h-4 text-slate-700"></i>
+    </button>
+    <header class="bg-white border-b border-slate-100 pl-16 pr-8 py-4 flex items-center justify-between sticky top-0 z-20">
+      <div>
+        <h2 class="text-xl font-bold text-slate-900">ผู้ป่วยในความดูแล</h2>
+        <p class="text-sm text-slate-500 mt-0.5">18 ราย · Ward 3A · อายุรกรรม</p>
+      </div>
+      <div class="flex items-center gap-3">
+        <div class="relative">
+          <i data-lucide="search" class="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2"></i>
+          <input type="text" placeholder="ค้นหาด้วย HN, AN..." class="w-72 bg-slate-50 border border-slate-200 rounded-lg pl-10 pr-4 py-2 text-sm focus:outline-none focus:border-brand-700 focus:bg-white">
+        </div>
+        <button onclick="openModal('add-patient-modal')" class="bg-brand-900 hover:bg-brand-950 text-white font-bold px-5 py-2 rounded-lg flex items-center gap-2 text-sm shadow-lg shadow-brand-900/20">
+          <i data-lucide="plus" class="w-4 h-4"></i>เพิ่มผู้ป่วย
+        </button>
+      </div>
+    </header>
+
+    <div class="p-8">
+      <div class="flex gap-2 mb-5">
+        <button class="chip chip-active">ทั้งหมด · 18</button>
+        <button class="chip chip-inactive">Cat 1A · 8</button>
+        <button class="chip chip-inactive">Cat 1B · 5</button>
+        <button class="chip chip-inactive">Cat 2A · 3</button>
+        <button class="chip chip-inactive">Cat 2B · 2</button>
+        <span class="ml-auto"></span>
+        <button class="chip chip-inactive flex items-center gap-1"><i data-lucide="filter" class="w-3.5 h-3.5"></i>กรองเพิ่ม</button>
+        <button class="chip chip-inactive flex items-center gap-1"><i data-lucide="arrow-up-down" class="w-3.5 h-3.5"></i>เรียง</button>
+      </div>
+
+      <div class="bg-white rounded-2xl border border-slate-100 overflow-hidden">
+        <table class="w-full text-sm">
+          <thead class="bg-slate-50 text-xs uppercase tracking-wider text-slate-500">
+            <tr>
+              <th class="px-6 py-3 text-left font-semibold">HN / AN</th>
+              <th class="px-6 py-3 text-left font-semibold">เพศ / อายุ</th>
+              <th class="px-6 py-3 text-left font-semibold">เตียง</th>
+              <th class="px-6 py-3 text-left font-semibold">การวินิจฉัยหลัก</th>
+              <th class="px-6 py-3 text-left font-semibold">ระดับ IAD</th>
+              <th class="px-6 py-3 text-left font-semibold">แนวโน้ม</th>
+              <th class="px-6 py-3 text-right font-semibold">ประเมินล่าสุด</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-slate-100">
+            <tr class="hover:bg-slate-50 cursor-pointer" onclick="window.location.href='patient-detail.html'">
+              <td class="px-6 py-3"><div class="font-mono font-bold text-slate-900">HN 670012</div><div class="text-[11px] text-slate-500 font-mono">AN 670/12345</div></td>
+              <td class="px-6 py-3 text-slate-700">หญิง, 72</td>
+              <td class="px-6 py-3 text-slate-700">15</td>
+              <td class="px-6 py-3 text-slate-600 text-xs">Stroke</td>
+              <td class="px-6 py-3"><span class="severity-1b text-[10px] font-bold px-1.5 py-0.5 rounded">Cat 1B</span></td>
+              <td class="px-6 py-3"><span class="inline-flex items-center gap-1 text-xs text-orange-700"><i data-lucide="trending-up" class="w-3.5 h-3.5"></i>แย่ลง</span></td>
+              <td class="px-6 py-3 text-right text-xs text-slate-500 font-mono">2 ชม.</td>
+            </tr>
+            <tr class="hover:bg-slate-50 cursor-pointer" onclick="window.location.href='patient-detail.html'">
+              <td class="px-6 py-3"><div class="font-mono font-bold text-slate-900">HN 670045</div><div class="text-[11px] text-slate-500 font-mono">AN 670/12378</div></td>
+              <td class="px-6 py-3 text-slate-700">ชาย, 68</td>
+              <td class="px-6 py-3 text-slate-700">22</td>
+              <td class="px-6 py-3 text-slate-600 text-xs">DM with neuropathy</td>
+              <td class="px-6 py-3"><span class="severity-2a text-[10px] font-bold px-1.5 py-0.5 rounded">Cat 2A</span></td>
+              <td class="px-6 py-3"><span class="inline-flex items-center gap-1 text-xs text-slate-500"><i data-lucide="minus" class="w-3.5 h-3.5"></i>คงที่</span></td>
+              <td class="px-6 py-3 text-right text-xs text-slate-500 font-mono">4 ชม.</td>
+            </tr>
+            <tr class="hover:bg-slate-50 cursor-pointer" onclick="window.location.href='patient-detail.html'">
+              <td class="px-6 py-3"><div class="font-mono font-bold text-slate-900">HN 670089</div><div class="text-[11px] text-slate-500 font-mono">AN 670/12401</div></td>
+              <td class="px-6 py-3 text-slate-700">หญิง, 81</td>
+              <td class="px-6 py-3 text-slate-700">8</td>
+              <td class="px-6 py-3 text-slate-600 text-xs">COPD</td>
+              <td class="px-6 py-3"><span class="severity-1a text-[10px] font-bold px-1.5 py-0.5 rounded">Cat 1A</span></td>
+              <td class="px-6 py-3"><span class="inline-flex items-center gap-1 text-xs text-emerald-700"><i data-lucide="trending-down" class="w-3.5 h-3.5"></i>ดีขึ้น</span></td>
+              <td class="px-6 py-3 text-right text-xs text-slate-500 font-mono">เมื่อวาน</td>
+            </tr>
+            <tr class="hover:bg-slate-50 cursor-pointer" onclick="window.location.href='patient-detail.html'">
+              <td class="px-6 py-3"><div class="font-mono font-bold text-slate-900">HN 670102</div><div class="text-[11px] text-slate-500 font-mono">AN 670/12450</div></td>
+              <td class="px-6 py-3 text-slate-700">หญิง, 65</td>
+              <td class="px-6 py-3 text-slate-700">11</td>
+              <td class="px-6 py-3 text-slate-600 text-xs">Sepsis</td>
+              <td class="px-6 py-3"><span class="severity-2b text-[10px] font-bold px-1.5 py-0.5 rounded">Cat 2B</span></td>
+              <td class="px-6 py-3"><span class="inline-flex items-center gap-1 text-xs text-red-700"><i data-lucide="trending-up" class="w-3.5 h-3.5"></i>เฝ้าระวัง</span></td>
+              <td class="px-6 py-3 text-right text-xs text-slate-500 font-mono">เมื่อวาน</td>
+            </tr>
+            <tr class="hover:bg-slate-50 cursor-pointer" onclick="window.location.href='patient-detail.html'">
+              <td class="px-6 py-3"><div class="font-mono font-bold text-slate-900">HN 670156</div><div class="text-[11px] text-slate-500 font-mono">AN 670/12489</div></td>
+              <td class="px-6 py-3 text-slate-700">ชาย, 75</td>
+              <td class="px-6 py-3 text-slate-700">12</td>
+              <td class="px-6 py-3 text-slate-600 text-xs">CKD stage 4</td>
+              <td class="px-6 py-3"><span class="severity-1a text-[10px] font-bold px-1.5 py-0.5 rounded">Cat 1A</span></td>
+              <td class="px-6 py-3"><span class="inline-flex items-center gap-1 text-xs text-slate-500"><i data-lucide="minus" class="w-3.5 h-3.5"></i>คงที่</span></td>
+              <td class="px-6 py-3 text-right text-xs text-slate-500 font-mono">2 วัน</td>
+            </tr>
+          </tbody>
+        </table>
+        <div class="px-6 py-3 border-t border-slate-100 flex items-center justify-between bg-slate-50">
+          <div class="text-xs text-slate-500">แสดง 1-5 จาก <span class="font-bold text-slate-900">18</span> ราย</div>
+          <div class="flex gap-1">
+            <button class="px-3 py-1.5 text-xs font-semibold text-slate-400 hover:text-slate-700">‹ ก่อนหน้า</button>
+            <button class="px-3 py-1.5 text-xs font-bold text-white bg-brand-900 rounded">1</button>
+            <button class="px-3 py-1.5 text-xs font-semibold text-slate-700 hover:bg-slate-100 rounded">2</button>
+            <button class="px-3 py-1.5 text-xs font-semibold text-slate-700 hover:bg-slate-100 rounded">3</button>
+            <button class="px-3 py-1.5 text-xs font-semibold text-slate-700 hover:text-brand-700">ถัดไป ›</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
+
+<!-- MODAL: Add Patient -->
+<div id="add-patient-modal" class="hidden fixed inset-0 modal-backdrop z-50 flex items-end md:items-center justify-center p-0 md:p-6" onclick="if(event.target===this) closeModal('add-patient-modal')">
+  <div class="modal-content bg-white rounded-t-3xl md:rounded-2xl w-full max-w-lg max-h-[90vh] overflow-hidden flex flex-col">
+    <div class="px-6 py-4 border-b border-slate-100 flex items-center justify-between">
+      <div>
+        <h3 class="text-base font-bold text-slate-900">เพิ่มผู้ป่วยใหม่</h3>
+        <p class="text-xs text-slate-500 mt-0.5">บันทึก HN และ AN เท่านั้น ไม่บันทึกชื่อ</p>
+      </div>
+      <button onclick="closeModal('add-patient-modal')" class="w-8 h-8 rounded-full hover:bg-slate-100 flex items-center justify-center">
+        <i data-lucide="x" class="w-4 h-4 text-slate-500"></i>
+      </button>
+    </div>
+    <form class="flex-1 overflow-y-auto p-6 space-y-4" onsubmit="event.preventDefault(); closeModal('add-patient-modal'); alert('บันทึกผู้ป่วยใหม่เรียบร้อย');">
+      <div class="grid grid-cols-2 gap-3">
+        <div>
+          <label class="text-xs font-semibold text-slate-700 mb-1.5 block">HN *</label>
+          <input type="text" placeholder="670XXX" required class="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2.5 text-sm font-mono focus:outline-none focus:border-brand-700">
+        </div>
+        <div>
+          <label class="text-xs font-semibold text-slate-700 mb-1.5 block">AN *</label>
+          <input type="text" placeholder="670/XXXXX" required class="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2.5 text-sm font-mono focus:outline-none focus:border-brand-700">
+        </div>
+      </div>
+      <div class="grid grid-cols-2 gap-3">
+        <div>
+          <label class="text-xs font-semibold text-slate-700 mb-1.5 block">เพศ *</label>
+          <select required class="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:border-brand-700">
+            <option value="">เลือก</option><option>ชาย</option><option>หญิง</option>
+          </select>
+        </div>
+        <div>
+          <label class="text-xs font-semibold text-slate-700 mb-1.5 block">อายุ (ปี) *</label>
+          <input type="number" placeholder="72" required class="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2.5 text-sm font-mono focus:outline-none focus:border-brand-700">
+        </div>
+      </div>
+      <div class="grid grid-cols-2 gap-3">
+        <div>
+          <label class="text-xs font-semibold text-slate-700 mb-1.5 block">เตียง *</label>
+          <input type="text" placeholder="15" required class="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:border-brand-700">
+        </div>
+        <div>
+          <label class="text-xs font-semibold text-slate-700 mb-1.5 block">วันที่ admit</label>
+          <input type="date" value="2026-05-11" class="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:border-brand-700">
+        </div>
+      </div>
+      <div>
+        <label class="text-xs font-semibold text-slate-700 mb-1.5 block">การวินิจฉัยหลัก</label>
+        <input type="text" placeholder="เช่น Stroke, DM, COPD..." class="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:border-brand-700">
+      </div>
+      <div>
+        <label class="text-xs font-semibold text-slate-700 mb-1.5 block">หมายเหตุ</label>
+        <textarea rows="2" placeholder="ข้อมูลเพิ่มเติม (ถ้ามี)" class="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:border-brand-700"></textarea>
+      </div>
+      <div class="bg-blue-50 border border-blue-200 rounded-lg p-3 flex items-start gap-2">
+        <i data-lucide="info" class="w-4 h-4 text-blue-700 flex-shrink-0 mt-0.5"></i>
+        <p class="text-xs text-blue-900 leading-relaxed">ระบบไม่บันทึกชื่อผู้ป่วยเพื่อความปลอดภัยตาม PDPA หากต้องตรวจสอบ ให้ใช้ HN/AN ตรวจกับระบบโรงพยาบาล</p>
+      </div>
+    </form>
+    <div class="px-6 py-3 border-t border-slate-100 bg-slate-50 flex items-center justify-end gap-2">
+      <button onclick="closeModal('add-patient-modal')" class="px-4 py-2 text-sm font-semibold text-slate-600 hover:text-slate-900">ยกเลิก</button>
+      <button onclick="closeModal('add-patient-modal'); alert('บันทึกผู้ป่วยใหม่เรียบร้อย');" class="bg-brand-900 hover:bg-brand-950 text-white font-bold px-5 py-2 rounded-lg text-sm flex items-center gap-2">
+        <i data-lucide="save" class="w-4 h-4"></i>บันทึก
+      </button>
+    </div>
+  </div>
+</div>
+
+<script>
+function openModal(id) { document.getElementById(id).classList.remove('hidden'); document.body.style.overflow = 'hidden'; setTimeout(() => lucide.createIcons(), 50); }
+function closeModal(id) { document.getElementById(id).classList.add('hidden'); document.body.style.overflow = ''; }
+
+document.querySelectorAll('.chip').forEach(c => c.addEventListener('click', e => {
+  if (!c.closest('.modal-content')) {
+    document.querySelectorAll('.chip').forEach(x => { x.classList.remove('chip-active'); x.classList.add('chip-inactive'); });
+    c.classList.remove('chip-inactive'); c.classList.add('chip-active');
+  }
+}));
+function toggleSidebar() {
+  const sb = document.getElementById('sidebar');
+  if (!sb) return;
+  sb.classList.toggle('collapsed');
+  const icon = document.getElementById('sidebar-toggle-icon');
+  if (icon) {
+    icon.setAttribute('data-lucide', sb.classList.contains('collapsed') ? 'panel-left-open' : 'panel-left-close');
+    lucide.createIcons();
+  }
+}
+
+lucide.createIcons();
+</script>
+</body>
+</html>

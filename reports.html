@@ -1,0 +1,433 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>IAD SmartCare — รายงาน</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@500;700&family=Noto+Sans+Thai:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+<script>
+tailwind.config = { theme: { extend: { colors: { brand: { 50:'#f0fdfa',100:'#ccfbf1',200:'#99f6e4',300:'#5eead4',400:'#2dd4bf',500:'#14b8a6',600:'#0d9488',700:'#0f766e',800:'#115e59',900:'#134e4a',950:'#042f2e' } }, fontFamily: { sans: ['Inter','Noto Sans Thai','system-ui','sans-serif'], mono: ['JetBrains Mono','monospace'] } } } }
+</script>
+<style>
+body { font-family: 'Inter','Noto Sans Thai',sans-serif; }
+.font-mono { font-family: 'JetBrains Mono',monospace; }
+.modal-backdrop { background: rgba(15,23,42,0.5); backdrop-filter: blur(4px); }
+@keyframes modal-in { from { opacity: 0; transform: scale(0.95); } to { opacity: 1; transform: scale(1); } }
+.modal-content { animation: modal-in 0.2s ease-out; }
+.range-btn { padding: 8px 14px; font-size: 12px; font-weight: 600; border-radius: 8px; cursor: pointer; transition: all 0.15s; }
+.range-btn.active { background: #134e4a; color: white; }
+.range-btn:not(.active) { color: #475569; }
+.range-btn:not(.active):hover { background: #f1f5f9; }
+.export-card { transition: all 0.15s; cursor: pointer; }
+.export-card:hover { transform: translateY(-2px); }
+
+/* Sidebar toggle */
+#sidebar { transition: margin-left 0.3s ease, opacity 0.2s ease; }
+#sidebar.collapsed { margin-left: -16rem; opacity: 0.4; pointer-events: none; }
+#sidebar-toggle-btn { transition: all 0.2s ease; }
+#sidebar-toggle-btn:hover { transform: scale(1.05); }
+</style>
+</head>
+<body class="bg-slate-50 min-h-screen">
+
+<!-- MOBILE -->
+<div class="md:hidden min-h-screen pb-24">
+  <div class="bg-white px-5 pt-5 pb-4 border-b border-slate-100 sticky top-0 z-20">
+    <div class="flex items-center justify-between">
+      <div>
+        <h1 class="text-lg font-bold text-slate-900">รายงาน</h1>
+        <p class="text-[11px] text-slate-500 font-mono">เม.ย. – พ.ค. 2569</p>
+      </div>
+      <button onclick="openModal('export-modal')" class="bg-brand-900 text-white font-bold px-3 py-2 rounded-lg flex items-center gap-1.5 text-xs">
+        <i data-lucide="download" class="w-3.5 h-3.5"></i>Export
+      </button>
+    </div>
+    <div class="flex gap-1 mt-3 bg-slate-100 p-1 rounded-lg">
+      <button class="range-btn active flex-1">เดือนนี้</button>
+      <button class="range-btn flex-1">ไตรมาส</button>
+      <button class="range-btn flex-1">ปีนี้</button>
+      <button class="range-btn flex-1">กำหนดเอง</button>
+    </div>
+  </div>
+
+  <!-- Stats -->
+  <div class="px-5 pt-5 grid grid-cols-2 gap-3">
+    <div class="bg-white rounded-2xl p-4 border border-slate-100">
+      <p class="text-[10px] text-slate-500 uppercase tracking-wider">อุบัติการณ์ใหม่</p>
+      <div class="text-2xl font-extrabold text-slate-900 mt-2">12</div>
+      <p class="text-[10px] text-slate-500">ต่อ 1,000 วันนอน</p>
+    </div>
+    <div class="bg-white rounded-2xl p-4 border border-slate-100">
+      <p class="text-[10px] text-slate-500 uppercase tracking-wider">ความชุก</p>
+      <div class="text-2xl font-extrabold text-slate-900 mt-2">8.2%</div>
+      <p class="text-[10px] text-emerald-600">↓ ลด 1.5% MoM</p>
+    </div>
+    <div class="bg-white rounded-2xl p-4 border border-slate-100">
+      <p class="text-[10px] text-slate-500 uppercase tracking-wider">อัตราหายในเวลา</p>
+      <div class="text-2xl font-extrabold text-emerald-600 mt-2">72%</div>
+      <p class="text-[10px] text-slate-500">Cat 1 ใน 24 ชม.</p>
+    </div>
+    <div class="bg-white rounded-2xl p-4 border border-slate-100">
+      <p class="text-[10px] text-slate-500 uppercase tracking-wider">ระดับเฉลี่ย</p>
+      <div class="text-2xl font-extrabold text-slate-900 mt-2">1.4</div>
+      <p class="text-[10px] text-slate-500">/4 ระดับ</p>
+    </div>
+  </div>
+
+  <!-- Trend chart -->
+  <div class="px-5 pt-4">
+    <div class="bg-white rounded-2xl p-5 border border-slate-100">
+      <h3 class="text-sm font-bold text-slate-900 mb-4">แนวโน้มอุบัติการณ์</h3>
+      <div class="flex items-end gap-1.5 h-32">
+        <div class="flex-1 flex flex-col items-center gap-1">
+          <div class="w-full bg-brand-200 rounded-t" style="height: 60%"></div>
+          <div class="text-[9px] text-slate-400 font-mono">ม.ค.</div>
+        </div>
+        <div class="flex-1 flex flex-col items-center gap-1">
+          <div class="w-full bg-brand-300 rounded-t" style="height: 75%"></div>
+          <div class="text-[9px] text-slate-400 font-mono">ก.พ.</div>
+        </div>
+        <div class="flex-1 flex flex-col items-center gap-1">
+          <div class="w-full bg-brand-400 rounded-t" style="height: 90%"></div>
+          <div class="text-[9px] text-slate-400 font-mono">มี.ค.</div>
+        </div>
+        <div class="flex-1 flex flex-col items-center gap-1">
+          <div class="w-full bg-brand-500 rounded-t" style="height: 80%"></div>
+          <div class="text-[9px] text-slate-400 font-mono">เม.ย.</div>
+        </div>
+        <div class="flex-1 flex flex-col items-center gap-1">
+          <div class="w-full bg-brand-700 rounded-t" style="height: 65%"></div>
+          <div class="text-[9px] font-bold text-slate-700 font-mono">พ.ค.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Severity distribution -->
+  <div class="px-5 pt-4">
+    <div class="bg-white rounded-2xl p-5 border border-slate-100">
+      <h3 class="text-sm font-bold text-slate-900 mb-4">กระจาย GLOBIAD</h3>
+      <div class="space-y-3">
+        <div>
+          <div class="flex justify-between text-xs mb-1"><span class="text-emerald-700 font-semibold">Cat 1A</span><span class="font-mono font-bold">42 ราย · 52%</span></div>
+          <div class="h-2 bg-slate-100 rounded-full"><div class="h-full bg-emerald-500 rounded-full" style="width: 52%"></div></div>
+        </div>
+        <div>
+          <div class="flex justify-between text-xs mb-1"><span class="text-amber-700 font-semibold">Cat 1B</span><span class="font-mono font-bold">23 ราย · 28%</span></div>
+          <div class="h-2 bg-slate-100 rounded-full"><div class="h-full bg-amber-500 rounded-full" style="width: 28%"></div></div>
+        </div>
+        <div>
+          <div class="flex justify-between text-xs mb-1"><span class="text-orange-700 font-semibold">Cat 2A</span><span class="font-mono font-bold">11 ราย · 14%</span></div>
+          <div class="h-2 bg-slate-100 rounded-full"><div class="h-full bg-orange-500 rounded-full" style="width: 14%"></div></div>
+        </div>
+        <div>
+          <div class="flex justify-between text-xs mb-1"><span class="text-red-700 font-semibold">Cat 2B</span><span class="font-mono font-bold">5 ราย · 6%</span></div>
+          <div class="h-2 bg-slate-100 rounded-full"><div class="h-full bg-red-500 rounded-full" style="width: 6%"></div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Bottom Nav -->
+  <div class="fixed bottom-0 left-0 right-0 bg-white border-t border-slate-200 px-2 py-2 flex items-center justify-around z-30">
+    <a href="dashboard.html" class="flex flex-col items-center gap-1 px-4 py-1.5">
+      <i data-lucide="home" class="w-5 h-5 text-slate-400"></i><span class="text-[10px] font-medium text-slate-500">หน้าหลัก</span>
+    </a>
+    <a href="patients.html" class="flex flex-col items-center gap-1 px-4 py-1.5">
+      <i data-lucide="users" class="w-5 h-5 text-slate-400"></i><span class="text-[10px] font-medium text-slate-500">ผู้ป่วย</span>
+    </a>
+    <a href="assessment.html" class="flex flex-col items-center gap-1 -mt-6">
+      <div class="w-14 h-14 bg-brand-900 rounded-full flex items-center justify-center shadow-lg shadow-brand-900/30 ring-4 ring-white">
+        <i data-lucide="plus" class="w-7 h-7 text-white"></i>
+      </div>
+    </a>
+    <a href="reports.html" class="flex flex-col items-center gap-1 px-4 py-1.5">
+      <i data-lucide="bar-chart-3" class="w-5 h-5 text-brand-700"></i><span class="text-[10px] font-bold text-brand-700">รายงาน</span>
+    </a>
+    <a href="settings.html" class="flex flex-col items-center gap-1 px-4 py-1.5">
+      <i data-lucide="settings" class="w-5 h-5 text-slate-400"></i><span class="text-[10px] font-medium text-slate-500">ตั้งค่า</span>
+    </a>
+  </div>
+</div>
+
+<!-- DESKTOP -->
+<div class="hidden md:flex min-h-screen">
+  <aside id="sidebar" class="w-64 bg-white border-r border-slate-200 flex flex-col">
+    <div class="p-6 border-b border-slate-100">
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 bg-brand-900 rounded-xl flex items-center justify-center"><i data-lucide="shield-plus" class="w-5 h-5 text-white"></i></div>
+        <div><h1 class="text-sm font-bold text-slate-900">IAD SmartCare</h1><p class="text-[10px] text-slate-500 uppercase tracking-wider">Ward 3A</p></div>
+      </div>
+    </div>
+    <nav class="flex-1 p-4 space-y-1">
+      <a href="dashboard.html" class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-600 hover:bg-slate-50"><i data-lucide="home" class="w-5 h-5"></i><span class="text-sm">หน้าหลัก</span></a>
+      <a href="patients.html" class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-600 hover:bg-slate-50"><i data-lucide="users" class="w-5 h-5"></i><span class="text-sm">ผู้ป่วย</span></a>
+      <a href="assessment.html" class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-600 hover:bg-slate-50"><i data-lucide="clipboard-check" class="w-5 h-5"></i><span class="text-sm">ประเมินใหม่</span></a>
+      <a href="reports.html" class="flex items-center gap-3 px-3 py-2.5 rounded-lg bg-brand-50 text-brand-900 font-semibold"><i data-lucide="bar-chart-3" class="w-5 h-5"></i><span class="text-sm">รายงาน</span></a>
+      <div class="pt-4 mt-4 border-t border-slate-100">
+        <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider px-3 mb-2">ระบบ</p>
+        <a href="users.html" class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-600 hover:bg-slate-50"><i data-lucide="user-cog" class="w-5 h-5"></i><span class="text-sm">จัดการผู้ใช้</span></a>
+        <a href="settings.html" class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-600 hover:bg-slate-50"><i data-lucide="settings" class="w-5 h-5"></i><span class="text-sm">ตั้งค่า</span></a>
+      </div>
+    </nav>
+  </aside>
+
+  <main class="flex-1 overflow-auto relative">
+    <button id="sidebar-toggle-btn" onclick="toggleSidebar()" class="hidden md:flex absolute top-3.5 left-3 z-30 w-9 h-9 rounded-lg bg-white hover:bg-slate-100 border border-slate-200 shadow-sm items-center justify-center" title="ซ่อน/แสดงเมนู">
+      <i data-lucide="panel-left-close" id="sidebar-toggle-icon" class="w-4 h-4 text-slate-700"></i>
+    </button>
+    <header class="bg-white border-b border-slate-100 pl-16 pr-8 py-4 flex items-center justify-between sticky top-0 z-20">
+      <div>
+        <h2 class="text-xl font-bold text-slate-900">รายงานและสถิติ</h2>
+        <p class="text-sm text-slate-500 mt-0.5">เม.ย. – พ.ค. 2569 · Ward 3A</p>
+      </div>
+      <div class="flex items-center gap-3">
+        <div class="flex gap-1 bg-slate-100 p-1 rounded-lg">
+          <button class="range-btn active">เดือนนี้</button>
+          <button class="range-btn">ไตรมาส</button>
+          <button class="range-btn">ปีนี้</button>
+          <button class="range-btn flex items-center gap-1"><i data-lucide="calendar" class="w-3.5 h-3.5"></i>กำหนดเอง</button>
+        </div>
+        <button onclick="openModal('export-modal')" class="bg-brand-900 hover:bg-brand-950 text-white font-bold px-5 py-2 rounded-lg flex items-center gap-2 text-sm shadow-lg shadow-brand-900/20">
+          <i data-lucide="download" class="w-4 h-4"></i>Export ข้อมูล
+        </button>
+      </div>
+    </header>
+
+    <div class="p-8 space-y-6">
+      <!-- KPI Cards -->
+      <div class="grid grid-cols-4 gap-4">
+        <div class="bg-white rounded-2xl p-5 border border-slate-100">
+          <div class="flex items-center justify-between">
+            <p class="text-xs font-bold text-slate-500 uppercase tracking-wider">อุบัติการณ์ใหม่</p>
+            <span class="text-[10px] font-bold text-red-700 bg-red-50 px-2 py-0.5 rounded">↑ 2.1%</span>
+          </div>
+          <div class="text-3xl font-extrabold text-slate-900 mt-3">12</div>
+          <div class="text-sm text-slate-500 mt-1">ต่อ 1,000 วันนอน</div>
+        </div>
+        <div class="bg-white rounded-2xl p-5 border border-slate-100">
+          <div class="flex items-center justify-between">
+            <p class="text-xs font-bold text-slate-500 uppercase tracking-wider">ความชุก</p>
+            <span class="text-[10px] font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded">↓ 1.5%</span>
+          </div>
+          <div class="text-3xl font-extrabold text-slate-900 mt-3">8.2%</div>
+          <div class="text-sm text-slate-500 mt-1">ของผู้ป่วยทั้งหมด</div>
+        </div>
+        <div class="bg-white rounded-2xl p-5 border border-slate-100">
+          <p class="text-xs font-bold text-slate-500 uppercase tracking-wider">อัตราหายในเวลา</p>
+          <div class="text-3xl font-extrabold text-emerald-600 mt-3">72%</div>
+          <div class="text-sm text-slate-500 mt-1">Cat 1 ใน 24 ชม.</div>
+        </div>
+        <div class="bg-white rounded-2xl p-5 border border-slate-100">
+          <p class="text-xs font-bold text-slate-500 uppercase tracking-wider">ระดับเฉลี่ย</p>
+          <div class="text-3xl font-extrabold text-slate-900 mt-3">1.4</div>
+          <div class="text-sm text-slate-500 mt-1">จาก 4 ระดับ</div>
+        </div>
+      </div>
+
+      <!-- Charts row -->
+      <div class="grid grid-cols-2 gap-6">
+        <div class="bg-white rounded-2xl p-6 border border-slate-100">
+          <div class="flex items-center justify-between mb-5">
+            <h3 class="text-base font-bold text-slate-900">แนวโน้มอุบัติการณ์ 5 เดือน</h3>
+            <span class="text-xs text-slate-400 font-mono">ราย/1,000 วันนอน</span>
+          </div>
+          <div class="flex items-end gap-3 h-48">
+            <div class="flex-1 flex flex-col items-center gap-2">
+              <div class="text-xs font-mono text-slate-500">8</div>
+              <div class="w-full bg-brand-200 rounded-t-lg" style="height: 50%"></div>
+              <div class="text-xs text-slate-500 font-mono">ม.ค.</div>
+            </div>
+            <div class="flex-1 flex flex-col items-center gap-2">
+              <div class="text-xs font-mono text-slate-500">11</div>
+              <div class="w-full bg-brand-300 rounded-t-lg" style="height: 70%"></div>
+              <div class="text-xs text-slate-500 font-mono">ก.พ.</div>
+            </div>
+            <div class="flex-1 flex flex-col items-center gap-2">
+              <div class="text-xs font-mono text-slate-500">14</div>
+              <div class="w-full bg-brand-400 rounded-t-lg" style="height: 90%"></div>
+              <div class="text-xs text-slate-500 font-mono">มี.ค.</div>
+            </div>
+            <div class="flex-1 flex flex-col items-center gap-2">
+              <div class="text-xs font-mono text-slate-500">13</div>
+              <div class="w-full bg-brand-500 rounded-t-lg" style="height: 82%"></div>
+              <div class="text-xs text-slate-500 font-mono">เม.ย.</div>
+            </div>
+            <div class="flex-1 flex flex-col items-center gap-2">
+              <div class="text-xs font-bold text-brand-900 font-mono">12</div>
+              <div class="w-full bg-brand-700 rounded-t-lg" style="height: 75%"></div>
+              <div class="text-xs font-bold text-slate-900 font-mono">พ.ค.</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="bg-white rounded-2xl p-6 border border-slate-100">
+          <h3 class="text-base font-bold text-slate-900 mb-5">กระจาย GLOBIAD ทั้งหมด 81 ราย</h3>
+          <div class="space-y-4">
+            <div>
+              <div class="flex justify-between text-xs mb-1.5"><span class="text-emerald-700 font-bold">Cat 1A</span><span class="font-mono font-bold text-slate-900">42 ราย · 52%</span></div>
+              <div class="h-3 bg-slate-100 rounded-full overflow-hidden"><div class="h-full bg-emerald-500 rounded-full" style="width: 52%"></div></div>
+            </div>
+            <div>
+              <div class="flex justify-between text-xs mb-1.5"><span class="text-amber-700 font-bold">Cat 1B</span><span class="font-mono font-bold text-slate-900">23 ราย · 28%</span></div>
+              <div class="h-3 bg-slate-100 rounded-full overflow-hidden"><div class="h-full bg-amber-500 rounded-full" style="width: 28%"></div></div>
+            </div>
+            <div>
+              <div class="flex justify-between text-xs mb-1.5"><span class="text-orange-700 font-bold">Cat 2A</span><span class="font-mono font-bold text-slate-900">11 ราย · 14%</span></div>
+              <div class="h-3 bg-slate-100 rounded-full overflow-hidden"><div class="h-full bg-orange-500 rounded-full" style="width: 14%"></div></div>
+            </div>
+            <div>
+              <div class="flex justify-between text-xs mb-1.5"><span class="text-red-700 font-bold">Cat 2B</span><span class="font-mono font-bold text-slate-900">5 ราย · 6%</span></div>
+              <div class="h-3 bg-slate-100 rounded-full overflow-hidden"><div class="h-full bg-red-500 rounded-full" style="width: 6%"></div></div>
+            </div>
+          </div>
+          <div class="grid grid-cols-2 gap-3 mt-5 pt-5 border-t border-slate-100 text-xs">
+            <div><div class="text-slate-500">ระดับ 1 (รวม)</div><div class="text-lg font-extrabold text-slate-900">65 <span class="text-xs font-normal text-slate-500">/ 80%</span></div></div>
+            <div><div class="text-slate-500">ระดับ 2 (รวม)</div><div class="text-lg font-extrabold text-slate-900">16 <span class="text-xs font-normal text-slate-500">/ 20%</span></div></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Top wound locations -->
+      <div class="grid grid-cols-3 gap-6">
+        <div class="bg-white rounded-2xl p-6 border border-slate-100">
+          <h3 class="text-base font-bold text-slate-900 mb-4">บริเวณที่พบบ่อย</h3>
+          <div class="space-y-3 text-sm">
+            <div class="flex items-center justify-between"><span class="text-slate-700">ก้นกบ</span><div class="flex items-center gap-2"><div class="h-2 w-20 bg-slate-100 rounded-full"><div class="h-full bg-brand-700 rounded-full" style="width: 78%"></div></div><span class="font-mono font-bold text-slate-900 text-xs">63</span></div></div>
+            <div class="flex items-center justify-between"><span class="text-slate-700">รอบทวารหนัก</span><div class="flex items-center gap-2"><div class="h-2 w-20 bg-slate-100 rounded-full"><div class="h-full bg-brand-700 rounded-full" style="width: 62%"></div></div><span class="font-mono font-bold text-slate-900 text-xs">50</span></div></div>
+            <div class="flex items-center justify-between"><span class="text-slate-700">ขาหนีบ</span><div class="flex items-center gap-2"><div class="h-2 w-20 bg-slate-100 rounded-full"><div class="h-full bg-brand-700 rounded-full" style="width: 32%"></div></div><span class="font-mono font-bold text-slate-900 text-xs">26</span></div></div>
+            <div class="flex items-center justify-between"><span class="text-slate-700">อวัยวะเพศ</span><div class="flex items-center gap-2"><div class="h-2 w-20 bg-slate-100 rounded-full"><div class="h-full bg-brand-700 rounded-full" style="width: 25%"></div></div><span class="font-mono font-bold text-slate-900 text-xs">20</span></div></div>
+          </div>
+        </div>
+
+        <div class="bg-white rounded-2xl p-6 border border-slate-100">
+          <h3 class="text-base font-bold text-slate-900 mb-4">ปัจจัยเสี่ยงที่พบ</h3>
+          <div class="space-y-3 text-sm">
+            <div class="flex items-center justify-between"><span class="text-slate-700">อุจจาระเหลว</span><span class="font-mono font-bold text-slate-900 text-xs">68 ราย</span></div>
+            <div class="flex items-center justify-between"><span class="text-slate-700">ปัสสาวะเล็ด</span><span class="font-mono font-bold text-slate-900 text-xs">54</span></div>
+            <div class="flex items-center justify-between"><span class="text-slate-700">เคลื่อนไหวจำกัด</span><span class="font-mono font-bold text-slate-900 text-xs">47</span></div>
+            <div class="flex items-center justify-between"><span class="text-slate-700">ใช้ผ้าอ้อม 24 ชม.</span><span class="font-mono font-bold text-slate-900 text-xs">42</span></div>
+          </div>
+        </div>
+
+        <div class="bg-gradient-to-br from-brand-700 to-brand-900 rounded-2xl p-6 text-white">
+          <h3 class="text-sm font-bold">สรุปการประเมิน</h3>
+          <div class="text-4xl font-extrabold mt-3 font-mono">412</div>
+          <p class="text-sm text-white/70 mt-1">การประเมินรวมในเดือนนี้</p>
+          <div class="space-y-2 mt-4 pt-4 border-t border-white/10 text-xs">
+            <div class="flex justify-between"><span class="text-white/60">เฉลี่ย/วัน</span><span class="font-bold">13.7 ครั้ง</span></div>
+            <div class="flex justify-between"><span class="text-white/60">เฉลี่ย/ผู้ป่วย</span><span class="font-bold">5.1 ครั้ง</span></div>
+            <div class="flex justify-between"><span class="text-white/60">ครบรอบตรงเวลา</span><span class="font-bold">94%</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
+
+<!-- MODAL: Export -->
+<div id="export-modal" class="hidden fixed inset-0 modal-backdrop z-50 flex items-end md:items-center justify-center p-0 md:p-6" onclick="if(event.target===this) closeModal('export-modal')">
+  <div class="modal-content bg-white rounded-t-3xl md:rounded-2xl w-full max-w-2xl overflow-hidden">
+    <div class="px-6 py-4 border-b border-slate-100 flex items-center justify-between">
+      <div>
+        <h3 class="text-base font-bold text-slate-900">Export ข้อมูล</h3>
+        <p class="text-xs text-slate-500 mt-0.5">เลือกรูปแบบและช่วงเวลา</p>
+      </div>
+      <button onclick="closeModal('export-modal')" class="w-8 h-8 rounded-full hover:bg-slate-100 flex items-center justify-center"><i data-lucide="x" class="w-4 h-4 text-slate-500"></i></button>
+    </div>
+
+    <div class="p-6">
+      <p class="text-xs font-bold text-slate-700 uppercase tracking-wider mb-3">รูปแบบไฟล์</p>
+      <div class="grid grid-cols-3 gap-3 mb-6">
+        <div class="export-card border-2 border-emerald-500 bg-emerald-50 rounded-xl p-4 ring-4 ring-emerald-100">
+          <div class="w-10 h-10 bg-emerald-500 rounded-lg flex items-center justify-center mb-3">
+            <i data-lucide="file-spreadsheet" class="w-5 h-5 text-white"></i>
+          </div>
+          <div class="text-sm font-bold text-slate-900">Excel</div>
+          <div class="text-[11px] text-slate-500 mt-0.5">.xlsx · พร้อม chart</div>
+        </div>
+        <div class="export-card border-2 border-slate-200 hover:border-blue-400 rounded-xl p-4">
+          <div class="w-10 h-10 bg-blue-500 rounded-lg flex items-center justify-center mb-3">
+            <i data-lucide="file-text" class="w-5 h-5 text-white"></i>
+          </div>
+          <div class="text-sm font-bold text-slate-900">CSV</div>
+          <div class="text-[11px] text-slate-500 mt-0.5">.csv · raw data</div>
+        </div>
+        <div class="export-card border-2 border-slate-200 hover:border-red-400 rounded-xl p-4">
+          <div class="w-10 h-10 bg-red-500 rounded-lg flex items-center justify-center mb-3">
+            <i data-lucide="file" class="w-5 h-5 text-white"></i>
+          </div>
+          <div class="text-sm font-bold text-slate-900">PDF</div>
+          <div class="text-[11px] text-slate-500 mt-0.5">.pdf · พิมพ์ได้</div>
+        </div>
+      </div>
+
+      <p class="text-xs font-bold text-slate-700 uppercase tracking-wider mb-3">ข้อมูลที่ต้องการ</p>
+      <div class="space-y-2 mb-6">
+        <label class="flex items-center gap-3 cursor-pointer p-3 bg-slate-50 rounded-lg hover:bg-slate-100">
+          <input type="checkbox" checked class="w-4 h-4 accent-brand-700 rounded"><span class="text-sm text-slate-700">ข้อมูลผู้ป่วย (HN, AN, เพศ, อายุ, เตียง, วินิจฉัย)</span>
+        </label>
+        <label class="flex items-center gap-3 cursor-pointer p-3 bg-slate-50 rounded-lg hover:bg-slate-100">
+          <input type="checkbox" checked class="w-4 h-4 accent-brand-700 rounded"><span class="text-sm text-slate-700">การประเมินทั้งหมด (ระดับ, บริเวณ, ปัจจัยเสี่ยง)</span>
+        </label>
+        <label class="flex items-center gap-3 cursor-pointer p-3 bg-slate-50 rounded-lg hover:bg-slate-100">
+          <input type="checkbox" class="w-4 h-4 accent-brand-700 rounded"><span class="text-sm text-slate-700">ลิงก์รูปภาพแผล (เก็บใน Drive)</span>
+        </label>
+        <label class="flex items-center gap-3 cursor-pointer p-3 bg-slate-50 rounded-lg hover:bg-slate-100">
+          <input type="checkbox" checked class="w-4 h-4 accent-brand-700 rounded"><span class="text-sm text-slate-700">KPI และสถิติสรุป</span>
+        </label>
+      </div>
+
+      <p class="text-xs font-bold text-slate-700 uppercase tracking-wider mb-3">ช่วงเวลา</p>
+      <div class="grid grid-cols-2 gap-3 mb-6">
+        <div>
+          <label class="text-xs text-slate-600 mb-1 block">วันที่เริ่ม</label>
+          <input type="date" value="2026-04-01" class="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-brand-700">
+        </div>
+        <div>
+          <label class="text-xs text-slate-600 mb-1 block">วันที่สิ้นสุด</label>
+          <input type="date" value="2026-05-11" class="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-brand-700">
+        </div>
+      </div>
+
+      <div class="bg-amber-50 border border-amber-200 rounded-lg p-3 flex items-start gap-2">
+        <i data-lucide="shield-alert" class="w-4 h-4 text-amber-700 flex-shrink-0 mt-0.5"></i>
+        <p class="text-xs text-amber-900 leading-relaxed">ไฟล์ export ไม่มีชื่อผู้ป่วย แต่ HN/AN ยังเป็นข้อมูลที่ระบุตัวตนได้ — เก็บรักษาความปลอดภัยตาม PDPA</p>
+      </div>
+    </div>
+
+    <div class="px-6 py-3 border-t border-slate-100 bg-slate-50 flex items-center justify-end gap-2">
+      <button onclick="closeModal('export-modal')" class="px-4 py-2 text-sm font-semibold text-slate-600">ยกเลิก</button>
+      <button onclick="closeModal('export-modal'); alert('กำลัง download IAD_Report_2026-05.xlsx...');" class="bg-brand-900 hover:bg-brand-950 text-white font-bold px-5 py-2 rounded-lg text-sm flex items-center gap-2">
+        <i data-lucide="download" class="w-4 h-4"></i>Download
+      </button>
+    </div>
+  </div>
+</div>
+
+<script>
+function openModal(id) { document.getElementById(id).classList.remove('hidden'); document.body.style.overflow = 'hidden'; setTimeout(() => lucide.createIcons(), 50); }
+function closeModal(id) { document.getElementById(id).classList.add('hidden'); document.body.style.overflow = ''; }
+document.querySelectorAll('.range-btn').forEach(b => b.addEventListener('click', e => {
+  if (!b.closest('.modal-content')) {
+    document.querySelectorAll('.range-btn').forEach(x => x.classList.remove('active'));
+    b.classList.add('active');
+  }
+}));
+function toggleSidebar() {
+  const sb = document.getElementById('sidebar');
+  if (!sb) return;
+  sb.classList.toggle('collapsed');
+  const icon = document.getElementById('sidebar-toggle-icon');
+  if (icon) {
+    icon.setAttribute('data-lucide', sb.classList.contains('collapsed') ? 'panel-left-open' : 'panel-left-close');
+    lucide.createIcons();
+  }
+}
+
+lucide.createIcons();
+</script>
+</body>
+</html>
